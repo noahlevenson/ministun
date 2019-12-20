@@ -66,7 +66,9 @@ class MStunHeader {
 	}
 
 	static decodeLen(len) {
-		return len[0];
+		const buf = Uint8Array.from(len);
+		const view = new Uint16Array(buf.buffer);
+		return view[0];
 	}
 }
 
@@ -78,7 +80,8 @@ class MStunAttr {
 		this.val = val;
 	}
 
-	static K_TYPE_OFF = [0, 4]; 
+	static K_TYPE_OFF = [0, 2]; 
+	static K_LEN_OFF = [2, 4];
 
 	static K_ATTR_TYPE = {
 		RESERVED_0000: 0,
@@ -131,6 +134,12 @@ class MStunAttr {
 		}
 		
 		return this.K_MSG_TYPE_TABLE.MALFORMED;
+	}
+
+	static decodeLen(len) {
+		const buf = Uint8Array.from(len);
+		const view = new Uint16Array(buf.buffer);
+		return view[0];
 	}
 }
 
