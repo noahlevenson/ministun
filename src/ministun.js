@@ -43,7 +43,7 @@ class MStunHeader {
 
 	static isValidMsb(buf) {
 		for (let i = 0; i < 2; i += 1) {
-			if (mCheckBit(buf, 0, i) !== 0) {
+			if (mGetBit(buf, 0, i) !== 0) {
 				return false;
 			}
 		}
@@ -55,20 +55,24 @@ class MStunHeader {
 		return mCompareBuf(magic, this.K_MAGIC);
 	}
 
-	static decodeType(type) {
-		const dtype = this.K_MSG_TYPE_TABLE.get(type.toString('hex'));
+	static decType(type) {
+		const dtype = this.K_MSG_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
 			return dtype;
 		}
 		
-		return this.K_MSG_TYPE_TABLE.MALFORMED;
+		return this.K_MSG_TYPE.MALFORMED;
 	}
 
-	static decodeLen(len) {
+	static decLen(len) {
 		const buf = Uint8Array.from(len);
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
+	}
+
+	static enLen(len) {
+		return mInt2Buf16(len); 
 	}
 }
 
@@ -126,20 +130,38 @@ class MStunAttr {
 		[new Buffer.from([0x80, 0x28]).toString("hex"), {type: this.K_ATTR_TYPE.FINGERPRINT, copt: true}]
 	]);
 
-	static decodeType(type) {
-		const dtype = this.K_ATTR_TYPE_TABLE.get(type.toString('hex'));
+	static K_ADDR_FAMILY = {
+		IPv4: 0,
+		IPv6: 1
+	};
+
+	static K_ADDR_FAMILY_TABLE = new Map([
+		[new Buffer.from([0x01]).toString("hex"), {fam: this.K_ADDR_FAMILY.IPv4, size: 4}],
+		[new Buffer.from([0x02]).toString("hex"), {fam: this.K_ADDR_FAMILY.IPv6, size: 16}]
+	]);
+
+	static decType(type) {
+		const dtype = this.K_ATTR_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
 			return dtype;
 		}
 		
-		return this.K_MSG_TYPE_TABLE.MALFORMED;
+		return this.K_MSG_TYPE.MALFORMED;
 	}
 
-	static decodeLen(len) {
+	static decLen(len) {
 		const buf = Uint8Array.from(len);
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
+	}
+
+	static enLen(len) {
+		return mInt2Buf16(len); 
+	}
+
+	static enMappedAddr(fam, addr, port) {
+
 	}
 }
 
@@ -162,13 +184,13 @@ class MStunMsg {
 
 		const type = buf.slice(MStunHeader.K_TYPE_OFF[0], MStunHeader.K_TYPE_OFF[1]);
 
-		if (MStunHeader.decodeType(type) === MStunHeader.K_MSG_TYPE.MALFORMED) {
+		if (MStunHeader.decType(type) === MStunHeader.K_MSG_TYPE.MALFORMED) {
 			return null;
 		}
 
 		const id = buf.slice(MStunHeader.K_ID_OFF[0], MStunHeader.K_ID_OFF[1]);
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
-		const dlen = MStunHeader.decodeLen(len);
+		const dlen = MStunHeader.decLen(len);
 
 		if (dlen !== MStunHeader.K_HDR_LEN - buf.length) {
 			return null;
@@ -190,11 +212,21 @@ class MStunMsg {
 	}
 }
 
-function mCheckBit(buffer, idx, bit) {
+// TODO: Validate arg < 0xFFFF?
+function mInt2Buf16(int) {
+	const buf = Buffer.alloc(2);
+
+	buf[0] = 0xFF & (int >>> 8);
+	buf[1] = 0xFF & int;
+
+	return buf;
+}
+
+function mGetBit(buffer, idx, off) {
 	let mask = Buffer.alloc(1);
 
 	mask[0] = 0b10000000;
-	mask[0] >>>= bit;
+	mask[0] >>>= off;
 
 	return (buffer[idx] & mask[0]) !== 0 ? 1 : 0;
 }
@@ -224,8 +256,9 @@ if (mConfig.ipv4) {
 	u4server.on("message", (msg, rinfo) => {
 		console.log(`Received msg: ${msg.toString()} from ${rinfo.address}:${rinfo.port}`);
 
-		const myMsg = MStunMsg.from(msg);
-		console.log(myMsg);
+		console.log(rinfo);
+		// const myMsg = MStunMsg.from(msg);
+		// console.log(myMsg);
 	});
 
 	u4server.bind(mConfig.port);
