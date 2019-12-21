@@ -1,9 +1,9 @@
 "use strict";
 
 const dgram = require("dgram");
-const MStunMsg = require("./mmsg.js");
-const MStunHeader = require("./mhdr.js");
-const MStunAttr = require("./mattr.js");
+const { MStunMsg } = require("./mmsg.js");
+const { MStunHeader } = require("./mhdr.js");
+const { MStunAttr } = require("./mattr.js");
 
 let u4server, u6server;
 
@@ -13,38 +13,7 @@ const mConfig = {
 	ipv6: true
 };
 
-// TODO: Validate arg < 0xFFFF?
-function mInt2Buf16(int) {
-	const buf = Buffer.alloc(2);
-
-	buf[0] = 0xFF & (int >>> 8);
-	buf[1] = 0xFF & int;
-
-	return buf;
-}
-
-function mGetBit(buffer, idx, off) {
-	let mask = Buffer.alloc(1);
-
-	mask[0] = 0b10000000;
-	mask[0] >>>= off;
-
-	return (buffer[idx] & mask[0]) !== 0 ? 1 : 0;
-}
-
-function mCompareBuf(a, b) {
-	if (a.length !== b.length) {
-		return false;
-	}
-
-	for (let i = 0; i < a.length; i += 1) {
-		if (a[i] != b[i]) {
-			return false;
-		}
-	}	
-
-	return true;
-}
+console.log(MStunHeader.enType(MStunHeader.K_MSG_TYPE.BINDING_INDICATION));
 
 if (mConfig.ipv4) {
 	u4server = dgram.createSocket("udp4");
@@ -58,8 +27,8 @@ if (mConfig.ipv4) {
 		console.log(`Received msg: ${msg.toString()} from ${rinfo.address}:${rinfo.port}`);
 
 		console.log(rinfo);
-		// const myMsg = MStunMsg.from(msg);
-		// console.log(myMsg);
+		const myMsg = MStunMsg.from(msg);
+		console.log(myMsg);
 	});
 
 	u4server.bind(mConfig.port);

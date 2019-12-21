@@ -1,3 +1,6 @@
+const { MTypeData } = require("./mcontainer.js");
+const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
+
 class MStunHeader {
 	static K_HDR_LEN = 20;
 	static K_MAGIC = new Buffer.from([0x21, 0x12, 0xA4, 0x42]);
@@ -15,10 +18,10 @@ class MStunHeader {
 	};
 
 	static K_MSG_TYPE_TABLE = new Map([
-		[new Buffer.from([0x00, 0x01]).toString("hex"), this.K_MSG_TYPE.BINDING_REQUEST],
-		[new Buffer.from([0x00, 0x11]).toString("hex"), this.K_MSG_TYPE.BINDING_INDICATION],
-		[new Buffer.from([0x01, 0x01]).toString("hex"), this.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE],
-		[new Buffer.from([0x01, 0x11]).toString("hex"), this.K_MSG_TYPE.BINDING_ERROR_RESPONSE]
+		[new Buffer.from([0x00, 0x01]).toString("hex"), new MTypeData(this.K_MSG_TYPE.BINDING_REQUEST, null, new Buffer.from([0x00, 0x01]))],
+		[new Buffer.from([0x00, 0x11]).toString("hex"), new MTypeData(this.K_MSG_TYPE.BINDING_INDICATION, null, new Buffer.from([0x00, 0x11]))],
+		[new Buffer.from([0x01, 0x01]).toString("hex"), new MTypeData(this.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, null, new Buffer.from([0x01, 0x01]))],
+		[new Buffer.from([0x01, 0x11]).toString("hex"), new MTypeData(this.K_MSG_TYPE.BINDING_ERROR_RESPONSE, null, new Buffer.from([0x01, 0x11]))]
 	]);
 
 	// TODO: Validation
@@ -57,6 +60,12 @@ class MStunHeader {
 		const buf = Uint8Array.from(len);
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
+	}
+
+	// TODO: Validate input
+	static enType(type) {
+		const tdata = Array.from(this.K_MSG_TYPE_TABLE.values())[type];
+		return tdata.bin;
 	}
 
 	static enLen(len) {

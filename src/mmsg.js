@@ -1,3 +1,5 @@
+const { MStunHeader } = require("./mhdr.js");
+
 class MStunMsg {
 	constructor() {
 		this.hdr = null;

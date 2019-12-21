@@ -1,5 +1,5 @@
 class MTypeData {
-	constructor(type, data, bin) {
+	constructor(type = null, data = null, bin = null) {
 		this.type = type;
 		this.data = data;
 		this.bin = bin;

@@ -1,4 +1,4 @@
-const MTypeData = require("./mcontainer.js").MTypeData;
+const { MTypeData } = require("./mcontainer.js");
 
 class MStunAttr {
 	// TODO: Validation
@@ -60,8 +60,8 @@ class MStunAttr {
 	};
 
 	static K_ADDR_FAMILY_TABLE = new Map([
-		[new Buffer.from([0x01]).toString("hex"), {fam: this.K_ADDR_FAMILY.IPv4, size: 4}],
-		[new Buffer.from([0x02]).toString("hex"), {fam: this.K_ADDR_FAMILY.IPv6, size: 16}]
+		[new Buffer.from([0x01]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv4, 4, new Buffer.from([0x01]))],
+		[new Buffer.from([0x02]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv6, 16, new Buffer.from([0x02]))]
 	]);
 
 	static decType(type) {
@@ -71,7 +71,7 @@ class MStunAttr {
 			return dtype;
 		}
 		
-		return {type: this.K_ATTR_TYPE.MALFORMED, copt: null, buf: null};
+		return new MTypeData(this.K_ATTR_TYPE.MALFORMED);
 	}
 
 	static decLen(len) {
@@ -80,8 +80,10 @@ class MStunAttr {
 		return view[0];
 	}
 
+	// TODO: Validate input
 	static enType(type) {
-
+		const tdata = Array.from(this.K_ATTR_TYPE_TABLE.values())[type];
+		return tdata.bin;
 	}
 
 	static enLen(len) {
