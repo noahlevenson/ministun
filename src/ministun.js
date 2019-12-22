@@ -13,7 +13,9 @@ const mConfig = {
 	ipv6: true
 };
 
-console.log(MStunHeader.enType(MStunHeader.K_MSG_TYPE.BINDING_INDICATION));
+const myAttr = new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [0, "127.255.6.10", 3]);
+
+console.log(myAttr)
 
 if (mConfig.ipv4) {
 	u4server = dgram.createSocket("udp4");

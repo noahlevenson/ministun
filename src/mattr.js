@@ -1,11 +1,12 @@
 const { MTypeData } = require("./mcontainer.js");
+const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
 class MStunAttr {
 	// TODO: Validation
-	constructor(type, len, val) {
-		this.type = type;
-		this.len = len;
-		this.val = val;
+	constructor(type = null, args = []) {
+		this.type = MStunAttr.enType(type);
+		this.val = Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args);
+		this.len = MStunAttr.enLen(this.val.length);
 	}
 
 	static K_TYPE_OFF = [0, 2]; 
@@ -35,7 +36,7 @@ class MStunAttr {
 
 	static K_ATTR_TYPE_TABLE = new Map([
 		[new Buffer.from([0x00, 0x00]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0000, false, new Buffer.from([0x00, 0x00]))],
-		[new Buffer.from([0x00, 0x01]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MAPPED_ADDRESS, false, new Buffer.from([0x00, 0x01]))],
+		[new Buffer.from([0x00, 0x01]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MAPPED_ADDRESS, false, new Buffer.from([0x00, 0x01]), this.enMappedAddr)],
 		[new Buffer.from([0x00, 0x02]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0002, false, new Buffer.from([0x00, 0x02]))],
 		[new Buffer.from([0x00, 0x03]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0003, false, new Buffer.from([0x00, 0x03]))],
 		[new Buffer.from([0x00, 0x04]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0004, false, new Buffer.from([0x00, 0x04]))],
@@ -56,7 +57,8 @@ class MStunAttr {
 
 	static K_ADDR_FAMILY = {
 		IPv4: 0,
-		IPv6: 1
+		IPv6: 1,
+		MALFORMED: 2
 	};
 
 	static K_ADDR_FAMILY_TABLE = new Map([
@@ -74,10 +76,21 @@ class MStunAttr {
 		return new MTypeData(this.K_ATTR_TYPE.MALFORMED);
 	}
 
+	// TODO: Validate input
 	static decLen(len) {
 		const buf = Uint8Array.from(len);
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
+	}
+
+	static decFam(fam) {
+		const dfam = this.K_ADDR_FAMILY_TABLE.get(fam.toString("hex"));
+
+		if (dfam !== undefined) {
+			return dfam;
+		}
+
+		return new MTypeData(this.K_ADDR_FAMILY.MALFORMED);
 	}
 
 	// TODO: Validate input
@@ -86,12 +99,36 @@ class MStunAttr {
 		return tdata.bin;
 	}
 
+	// TODO: Validate input
 	static enLen(len) {
 		return mInt2Buf16(len); 
 	}
 
-	static enMappedAddr(fam, addr, port) {
+	// TODO: Validate input
+	static enFam(fam) {
+		const tdata = Array.from(this.K_ADDR_FAMILY_TABLE.values())[fam];
+		return tdata.bin;
+	}
 
+	// TODO: Validate input
+	static enMappedAddr(famType, addrStr, portInt) {
+		const famData = Array.from(MStunAttr.K_ADDR_FAMILY_TABLE.values())[famType];
+
+		const zero = Buffer.alloc(1);
+		const fam = MStunAttr.enFam(famType);
+		const port = mInt2Buf16(portInt);
+
+		let addr;
+
+		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
+			addr = Buffer.from(addrStr.split(".").map((n) => {
+				return parseInt(n);
+			}));
+		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
+			// TODO: Handle this case
+		}
+
+		return Buffer.concat([zero, fam, port, addr]);
 	}
 }
 
