@@ -42,7 +42,7 @@ class MStunMsg {
 	}
 
 	// TODO: Write me
-	static serialize() {
+	serialize() {
 
 	}
 }

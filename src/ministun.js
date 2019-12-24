@@ -15,7 +15,7 @@ const mConfig = {
 
 const myAttr = new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [0, "127.255.6.10", 3]);
 
-console.log(myAttr)
+console.log(myAttr.serialize());
 
 if (mConfig.ipv4) {
 	u4server = dgram.createSocket("udp4");

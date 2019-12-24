@@ -28,7 +28,7 @@ class MStunHeader {
 	constructor(type, len, magic, id) {
 		this.type = type;
 		this.len = len;
-		this.magic = magic;
+		this.magic = magic; 
 		this.id = id;
 	}
 

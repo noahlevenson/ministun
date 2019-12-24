@@ -130,6 +130,10 @@ class MStunAttr {
 
 		return Buffer.concat([zero, fam, port, addr]);
 	}
+
+	serialize() {
+		return Buffer.concat([this.type, this.len, this.val]);
+	}
 }
 
 module.exports.MStunAttr = MStunAttr;
