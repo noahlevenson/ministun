@@ -5,12 +5,14 @@ const { MStunMsg } = require("./mmsg.js");
 const { MStunHeader } = require("./mhdr.js");
 const { MStunAttr } = require("./mattr.js");
 
+const { mInt2Buf16 } = require("./mutil.js"); 
+
 let u4server, u6server;
 
 const mConfig = {
 	port: 3478,
 	ipv4: true,
-	ipv6: true
+	ipv6: false // ipv6 handles ipv4 traffic as well
 };
 
 // const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY.IPv4, "127.255.6.10", 80])]
@@ -36,19 +38,21 @@ if (mConfig.ipv4) {
 		
 		const stunMsg = MStunMsg.from(msg);
 
-		// console.log(MStunHeader.decType(stunMsg.hdr.type));
+	//	console.log(MStunHeader.decType(stunMsg.hdr.type));
 
 
 		// Create a new stun message to send back
-		const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port])];
+		const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port])];
 
 		const myHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunHeader.K_HDR_LEN + MStunMsg.attrByteLength(attrs), stunMsg.hdr.id);
 		
 		const returnMsg = new MStunMsg(myHdr, attrs);
 
-		// u4server.send(returnMsg.serialize(), rinfo.port, rinfo.address, (err) => {
-		// 	console.log(`sent: ${rinfo.address} ${rinfo.port}`)
-		// });
+		console.log(returnMsg);
+
+		u4server.send(returnMsg.serialize(), rinfo.port, rinfo.address, (err) => {
+		 	console.log(`sent: ${rinfo.address} ${rinfo.port}`)
+		});
 
 
 	});

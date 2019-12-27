@@ -1,3 +1,4 @@
+const { MStunHeader } = require("./mhdr.js");
 const { MTypeData } = require("./mcontainer.js");
 const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
@@ -8,23 +9,23 @@ class MStunAttr {
 	static K_ATTR_TYPE = {
 		RESERVED_0000: 0,
 		MAPPED_ADDRESS: 1,
-		RESERVED_0002: 3,
-		RESERVED_0003: 4,
-		RESERVED_0004: 5,
-		RESERVED_0005: 6,
-		USERNAME: 7,
-		RESERVED_0007: 8,
-		MESSAGE_INTEGRITY: 9,
-		ERROR_CODE: 10,
-		UNKNOWN_ATTRIBUTES: 11,
-		RESERVED_000B: 12,
-		REALM: 13,
-		NONCE: 14,
-		XOR_MAPPED_ADDRESS: 15,
-		SOFTWARE: 16,
-		ALTERNATE_SERVER: 17,
-		FINGERPRINT: 18,
-		MALFORMED: 19
+		RESERVED_0002: 2,
+		RESERVED_0003: 3,
+		RESERVED_0004: 4,
+		RESERVED_0005: 5,
+		USERNAME: 6,
+		RESERVED_0007: 7,
+		MESSAGE_INTEGRITY: 8,
+		ERROR_CODE: 9,
+		UNKNOWN_ATTRIBUTES: 10,
+		RESERVED_000B: 11,
+		REALM: 12,
+		NONCE: 13,
+		XOR_MAPPED_ADDRESS: 14,
+		SOFTWARE: 15,
+		ALTERNATE_SERVER: 16,
+		FINGERPRINT: 17,
+		MALFORMED: 18
 	};
 
 	static K_ATTR_TYPE_TABLE = new Map([
@@ -42,7 +43,7 @@ class MStunAttr {
 		[new Buffer.from([0x00, 0x0B]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_000B, false, new Buffer.from([0x00, 0x0B]))],
 		[new Buffer.from([0x00, 0x14]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.REALM, false, new Buffer.from([0x00, 0x14]))],
 		[new Buffer.from([0x00, 0x15]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.NONCE, false, new Buffer.from([0x00, 0x15]))],
-		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, false, new Buffer.from([0x00, 0x20]))],
+		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, false, new Buffer.from([0x00, 0x20]), this.enXorMappedAddr)],
 		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, true, new Buffer.from([0x80, 0x22]))],
 		[new Buffer.from([0x80, 0x23]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ALTERNATE_SERVER, true, new Buffer.from([0x80, 0x23]))],
 		[new Buffer.from([0x80, 0x28]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.FINGERPRINT, true, new Buffer.from([0x80, 0x28]))]
@@ -118,10 +119,8 @@ class MStunAttr {
 		return tdata.bin;
 	}
 
-	// TODO: Validate input
+	// TODO: Validate input - also, are we sending everything in network byte order?
 	static enMappedAddr(famType, addrStr, portInt) {
-		const famData = Array.from(MStunAttr.K_ADDR_FAMILY_TABLE.values())[famType];
-
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
 		const port = mInt2Buf16(portInt);
@@ -137,6 +136,34 @@ class MStunAttr {
 
 		return Buffer.concat([zero, fam, port, addr]);
 	}
+
+	// TODO: Validate input - also, are we sending everything in network byte order?
+	static enXorMappedAddr(famType, addrStr, portInt) {
+		const zero = Buffer.alloc(1);
+		const fam = MStunAttr.enFam(famType);
+	
+		const port = mInt2Buf16(portInt);
+
+		for (let i = 0; i < port.length; i += 1) {
+			port[i] ^= MStunHeader.K_MAGIC[i]; 
+		}
+
+		let addr;
+
+		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
+			addr = Buffer.from(addrStr.split(".").map((n) => {
+				return parseInt(n);
+			}));	
+
+			for (let i = 0; i < addr.length; i += 1) {
+				addr[i] ^= MStunHeader.K_MAGIC[i];
+			}
+		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
+			// TODO: Handle this case
+		}	 
+
+		return Buffer.concat([zero, fam, port, addr]);
+	}	
 
 	length() {
 		return (this.type.length + this.len.length + this.val.length);
