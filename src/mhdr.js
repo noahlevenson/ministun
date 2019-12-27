@@ -3,6 +3,7 @@ const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
 class MStunHeader {
 	static K_HDR_LEN = 20;
+	static K_ID_LEN = 12;
 	static K_MAGIC = new Buffer.from([0x21, 0x12, 0xA4, 0x42]);
 	static K_MAGIC_OFF = [4, 8];
 	static K_TYPE_OFF = [0, 2];
@@ -25,11 +26,28 @@ class MStunHeader {
 	]);
 
 	// TODO: Validation
-	constructor(type, len, magic, id) {
-		this.type = type;
-		this.len = len;
+	constructor(type = null, len = null, id = Buffer.alloc(MStunHeader.K_ID_LEN), magic = MStunHeader.K_MAGIC) {
+		if (type === null && len === null) {
+			this.type = this.len = this.magic = this.id = null;
+			return;
+		} 
+
+		this.type = MStunHeader.enType(type);
+		this.len = MStunHeader.enLen(len);
 		this.magic = magic; 
 		this.id = id;
+	}
+
+	// TODO: Validation
+	static from(type, len, id, magic) {
+		const hdr = new this;
+
+		hdr.type = type;
+		hdr.len = len;
+		hdr.magic = magic;
+		hdr.id = id;
+	
+		return hdr;
 	}
 
 	static isValidMsb(buf) {
@@ -58,6 +76,8 @@ class MStunHeader {
 
 	static decLen(len) {
 		const buf = Uint8Array.from(len);
+		buf.reverse();
+		
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
 	}
@@ -70,6 +90,10 @@ class MStunHeader {
 
 	static enLen(len) {
 		return mInt2Buf16(len); 
+	}
+
+	serialize() {
+		return Buffer.concat([this.type, this.len, this.magic, this.id]);
 	}
 }
 

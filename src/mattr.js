@@ -2,13 +2,6 @@ const { MTypeData } = require("./mcontainer.js");
 const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
 class MStunAttr {
-	// TODO: Validation
-	constructor(type = null, args = []) {
-		this.type = MStunAttr.enType(type);
-		this.val = Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args);
-		this.len = MStunAttr.enLen(this.val.length);
-	}
-
 	static K_TYPE_OFF = [0, 2]; 
 	static K_LEN_OFF = [2, 4];
 
@@ -66,6 +59,19 @@ class MStunAttr {
 		[new Buffer.from([0x02]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv6, 16, new Buffer.from([0x02]))]
 	]);
 
+	// TODO: Validation
+	constructor(type = null, args = []) {
+		if (type === null) {
+			this.type = null;
+			this.args = [];
+			return;
+		}
+
+		this.type = MStunAttr.enType(type);
+		this.val = Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args);
+		this.len = MStunAttr.enLen(this.val.length);
+	}
+
 	static decType(type) {
 		const dtype = this.K_ATTR_TYPE_TABLE.get(type.toString("hex"));
 
@@ -79,6 +85,8 @@ class MStunAttr {
 	// TODO: Validate input
 	static decLen(len) {
 		const buf = Uint8Array.from(len);
+		buf.reverse();
+
 		const view = new Uint16Array(buf.buffer);
 		return view[0];
 	}
@@ -117,7 +125,6 @@ class MStunAttr {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
 		const port = mInt2Buf16(portInt);
-
 		let addr;
 
 		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
@@ -129,6 +136,10 @@ class MStunAttr {
 		}
 
 		return Buffer.concat([zero, fam, port, addr]);
+	}
+
+	length() {
+		return (this.type.length + this.len.length + this.val.length);
 	}
 
 	serialize() {

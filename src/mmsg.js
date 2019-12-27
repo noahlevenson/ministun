@@ -37,13 +37,19 @@ class MStunMsg {
 			// Validate attributes, create MStunAttr objects, push em into this.attr
 		}
 
-		msg.hdr = new MStunHeader(type, len, magic, id);
+		msg.hdr = MStunHeader.from(type, len, id, magic);
 		return msg;
+	}
+
+	static attrByteLength(attrs = this.attr) {
+		return attrs.reduce((sum, attr) => {
+			return sum + attr.length();
+		}, 0);
 	}
 
 	// TODO: Write me
 	serialize() {
-
+		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attr.map((attr) => { return attr.serialize(); }))]);
 	}
 }
 

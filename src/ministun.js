@@ -13,9 +13,13 @@ const mConfig = {
 	ipv6: true
 };
 
-const myAttr = new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [0, "127.255.6.10", 3]);
+// const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY.IPv4, "127.255.6.10", 80])]
 
-console.log(myAttr.serialize());
+// const myHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunHeader.K_HDR_LEN + MStunMsg.attrByteLength(attrs));
+
+// const myMsg = new MStunMsg(myHdr, attrs);
+
+// console.log(myMsg)
 
 if (mConfig.ipv4) {
 	u4server = dgram.createSocket("udp4");
@@ -28,9 +32,25 @@ if (mConfig.ipv4) {
 	u4server.on("message", (msg, rinfo) => {
 		console.log(`Received msg: ${msg.toString()} from ${rinfo.address}:${rinfo.port}`);
 
-		console.log(rinfo);
-		const myMsg = MStunMsg.from(msg);
-		console.log(myMsg);
+		// console.log(rinfo);
+		
+		const stunMsg = MStunMsg.from(msg);
+
+		// console.log(MStunHeader.decType(stunMsg.hdr.type));
+
+
+		// Create a new stun message to send back
+		const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port])];
+
+		const myHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunHeader.K_HDR_LEN + MStunMsg.attrByteLength(attrs), stunMsg.hdr.id);
+		
+		const returnMsg = new MStunMsg(myHdr, attrs);
+
+		// u4server.send(returnMsg.serialize(), rinfo.port, rinfo.address, (err) => {
+		// 	console.log(`sent: ${rinfo.address} ${rinfo.port}`)
+		// });
+
+
 	});
 
 	u4server.bind(mConfig.port);
