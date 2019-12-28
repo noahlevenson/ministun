@@ -27,7 +27,7 @@ class MStunMsg {
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
 		const dlen = MStunHeader.decLen(len);
 
-		if (dlen !== MStunHeader.K_HDR_LEN - buf.length) {
+		if (dlen !== buf.length - MStunHeader.K_HDR_LEN) {
 			return null;
 		}
 
@@ -41,13 +41,12 @@ class MStunMsg {
 		return msg;
 	}
 
-	static attrByteLength(attrs = this.attr) {
+	static attrByteLength(attrs) {
 		return attrs.reduce((sum, attr) => {
 			return sum + attr.length();
 		}, 0);
 	}
 
-	// TODO: Write me
 	serialize() {
 		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attr.map((attr) => { return attr.serialize(); }))]);
 	}

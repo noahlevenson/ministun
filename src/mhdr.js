@@ -34,8 +34,8 @@ class MStunHeader {
 
 		this.type = MStunHeader.enType(type);
 		this.len = MStunHeader.enLen(len);
-		this.magic = magic; 
-		this.id = id;
+		this.magic = Buffer.from(magic)
+		this.id = Buffer.from(id);
 	}
 
 	// TODO: Validation

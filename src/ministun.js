@@ -29,10 +29,8 @@ if (mConfig.ipv4) {
 		const stunMsg = MStunMsg.from(msg);
 
 		// Create a new stun message to send back
-		const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port])];
-
+		const attrs = [new MStunAttr(MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port])];
 		const myHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunMsg.attrByteLength(attrs), stunMsg.hdr.id);
-		
 		const returnMsg = new MStunMsg(myHdr, attrs);
 
 		u4server.send(returnMsg.serialize(), rinfo.port, rinfo.address, (err) => {
