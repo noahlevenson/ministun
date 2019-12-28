@@ -119,7 +119,7 @@ class MStunAttr {
 		return tdata.bin;
 	}
 
-	// TODO: Validate input - also, are we sending everything in network byte order?
+	// TODO: Validate input
 	static enMappedAddr(famType, addrStr, portInt) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
@@ -137,7 +137,7 @@ class MStunAttr {
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 
-	// TODO: Validate input - also, are we sending everything in network byte order?
+	// TODO: Validate input
 	static enXorMappedAddr(famType, addrStr, portInt) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
