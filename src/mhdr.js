@@ -1,5 +1,5 @@
+const { MUtil } = require("./mutil.js"); 
 const { MTypeData } = require("./mcontainer.js");
-const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
 class MStunHeader {
 	static K_HDR_LEN = 20;
@@ -52,7 +52,7 @@ class MStunHeader {
 
 	static isValidMsb(buf) {
 		for (let i = 0; i < 2; i += 1) {
-			if (mGetBit(buf, 0, i) !== 0) {
+			if (MUtil.getBit(buf, 0, i) !== 0) {
 				return false;
 			}
 		}
@@ -61,7 +61,7 @@ class MStunHeader {
 	}
 
 	static isValidMagic(magic) {
-		return mCompareBuf(magic, this.K_MAGIC);
+		return MUtil.compareBuf(magic, this.K_MAGIC);
 	}
 
 	static decType(type) {
@@ -89,7 +89,7 @@ class MStunHeader {
 	}
 
 	static enLen(len) {
-		return mInt2Buf16(len); 
+		return MUtil.int2Buf16(len); 
 	}
 
 	serialize() {

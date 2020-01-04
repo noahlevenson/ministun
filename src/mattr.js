@@ -1,6 +1,6 @@
+const { MUtil } = require("./mutil.js"); 
 const { MStunHeader } = require("./mhdr.js");
 const { MTypeData } = require("./mcontainer.js");
-const { mInt2Buf16, mGetBit, mCompareBuf} = require("./mutil.js");
 
 class MStunAttr {
 	static K_TYPE_OFF = [0, 2]; 
@@ -44,7 +44,7 @@ class MStunAttr {
 		[new Buffer.from([0x00, 0x14]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.REALM, false, new Buffer.from([0x00, 0x14]))],
 		[new Buffer.from([0x00, 0x15]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.NONCE, false, new Buffer.from([0x00, 0x15]))],
 		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, false, new Buffer.from([0x00, 0x20]), this.enXorMappedAddr)],
-		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, true, new Buffer.from([0x80, 0x22]))],
+		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, true, new Buffer.from([0x80, 0x22]), this.enSoftware)],
 		[new Buffer.from([0x80, 0x23]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ALTERNATE_SERVER, true, new Buffer.from([0x80, 0x23]))],
 		[new Buffer.from([0x80, 0x28]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.FINGERPRINT, true, new Buffer.from([0x80, 0x28]))]
 	]);
@@ -59,6 +59,8 @@ class MStunAttr {
 		[new Buffer.from([0x01]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv4, 4, new Buffer.from([0x01]))],
 		[new Buffer.from([0x02]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv6, 16, new Buffer.from([0x02]))]
 	]);
+
+	static K_SOFTWARE = Buffer.from("ministun by Noah Levenson");
 
 	// TODO: Validation
 	constructor(type = null, args = []) {
@@ -110,7 +112,7 @@ class MStunAttr {
 
 	// TODO: Validate input
 	static enLen(len) {
-		return mInt2Buf16(len); 
+		return MUtil.int2Buf16(len); 
 	}
 
 	// TODO: Validate input
@@ -123,7 +125,7 @@ class MStunAttr {
 	static enMappedAddr(famType, addrStr, portInt) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
-		const port = mInt2Buf16(portInt);
+		const port = MUtil.int2Buf16(portInt);
 		let addr;
 
 		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
@@ -142,7 +144,7 @@ class MStunAttr {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
 	
-		const port = mInt2Buf16(portInt);
+		const port = MUtil.int2Buf16(portInt);
 
 		for (let i = 0; i < port.length; i += 1) {
 			port[i] ^= MStunHeader.K_MAGIC[i]; 
@@ -163,6 +165,10 @@ class MStunAttr {
 		}	 
 
 		return Buffer.concat([zero, fam, port, addr]);
+	}
+
+	static enSoftware() {
+		return MStunAttr.K_SOFTWARE;
 	}	
 
 	length() {
