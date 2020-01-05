@@ -53,22 +53,27 @@ class Ministun {
 	}
 
 	onMessage(msg, rinfo) {
-		console.log(`Received msg: ${msg.toString()} from ${rinfo.address}:${rinfo.port}`);
+		const inMsg = MStunMsg.from(msg);
 
-		const stunMsg = MStunMsg.from(msg);
+		if (inMsg === null) {
+			return;
+		}
 
-		// Create a new stun message to send back
-		const attrs = [
-			new MStunAttr(MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port]),
-			new MStunAttr(MStunAttr.K_ATTR_TYPE.SOFTWARE)
-		];
+		if (MStunHeader.decType(inMsg.hdr.type).type === MStunHeader.K_MSG_TYPE.BINDING_REQUEST) {
+			const attrs = [
+				new MStunAttr(MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port]),
+				new MStunAttr(MStunAttr.K_ATTR_TYPE.SOFTWARE)
+			];
 
-		const myHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunMsg.attrByteLength(attrs), stunMsg.hdr.id);
-		const returnMsg = new MStunMsg(myHdr, attrs);
+			const outHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunMsg.attrByteLength(attrs), inMsg.hdr.id);
+			const outMsg = new MStunMsg(outHdr, attrs);
 
-		this.send(returnMsg.serialize(), rinfo.port, rinfo.address, (err) => {
-		 	console.log(`sent: ${rinfo.address} ${rinfo.port}`)
-		});
+			this.send(outMsg.serialize(), rinfo.port, rinfo.address, (err) => {
+			 	if (err) {
+			 		// TODO: Handle the error
+			 	}
+			});
+		}
 	}
 }
 
