@@ -129,41 +129,37 @@ class MStunAttr {
 		let addr;
 
 		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
-			addr = Buffer.from(addrStr.split(".").map((n) => {
-				return parseInt(n);
-			}));
+			addr = MUtil.ipv4Str2Buf32(addrStr);
 		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
-			// TODO: Handle this case
+			addr = MUtil.ipv6Str2Buf128(addrStr);
 		}
 
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 
 	// TODO: Validate input
-	static enXorMappedAddr(famType, addrStr, portInt) {
+	static enXorMappedAddr(famType, addrStr, portInt, id) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
-	
 		const port = MUtil.int2Buf16(portInt);
+		let addr;
+
+		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
+			addr = MUtil.ipv4Str2Buf32(addrStr);
+		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
+			addr = MUtil.ipv6Str2Buf128(addrStr);
+		}
 
 		for (let i = 0; i < port.length; i += 1) {
 			port[i] ^= MStunHeader.K_MAGIC[i]; 
 		}
 
-		let addr;
+		const c = Buffer.concat([MStunHeader.K_MAGIC, id]); 
 
-		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
-			addr = Buffer.from(addrStr.split(".").map((n) => {
-				return parseInt(n);
-			}));	
-
-			for (let i = 0; i < addr.length; i += 1) {
-				addr[i] ^= MStunHeader.K_MAGIC[i];
-			}
-		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
-			// TODO: Handle this case
-		}	 
-
+		for (let i = 0; i < addr.length; i += 1) {
+			addr[i] ^= c[i];
+		}
+		
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 

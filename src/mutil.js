@@ -31,6 +31,42 @@ class MUtil {
 
 		return true;
 	}
+
+	// TODO: Validation
+	static ipv4Str2Buf32(str) {
+		const buf = Buffer.from(str.split(".").map((n) => {
+			return parseInt(n);
+		}));	
+
+		return buf;
+	}
+
+	// TODO: Validation
+	static ipv6Str2Buf128(str) {
+		const arr = str.split(":");
+		
+		// It's an ipv4 mapped ipv6 address
+		if (arr[arr.length - 2].toUpperCase() === "FFFF" && arr[arr.length - 1].includes(".")) {
+			arr[arr.length - 1] = arr[arr.length - 1].split(".").map((n) => {
+				return parseInt(n).toString(16).padStart(2, "0");
+			}).join("");
+		}
+
+		const hs = arr.join("");
+		const buf = Buffer.alloc(16);
+
+		let i = hs.length - 2;
+		let j = buf.length - 1;
+
+		while (i >= 0) {
+			buf[j] = parseInt(hs.substring(i, i + 2), 16);
+
+			i -= 2;
+			j -= 1;
+		}
+
+		return buf;
+	}
 }
 
 module.exports.MUtil = MUtil;
