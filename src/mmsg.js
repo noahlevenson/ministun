@@ -48,7 +48,9 @@ class MStunMsg {
 	}
 
 	serialize() {
-		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attr.map((attr) => { return attr.serialize(); }))]);
+		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attr.map((attr) => { 
+			return attr.serialize(); 
+		}))]);
 	}
 }
 

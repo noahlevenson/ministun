@@ -5,24 +5,26 @@ const { MStunMsg } = require("./mmsg.js");
 const { MStunHeader } = require("./mhdr.js");
 const { MStunAttr } = require("./mattr.js");
 
+const { MUtil } = require("./mutil.js"); 
+
 class Ministun {
 	// TODO: Make args do something
-	constructor(port = 3478, ipv4 = true, ipv6 = true, log = console.log) {
-		if (!port || (!ipv4 && !ipv6)) {
+	constructor(port = 3478, udp4 = true, udp6 = true, log = console.log) {
+		if (!port || (!udp4 && !udp6)) {
 			return null;
 		}
 
-		this.ipv4 = ipv4;
-		this.ipv6 = ipv6;
+		this.udp4 = udp4;
+		this.udp6 = udp6;
 		this.port = port;
 		this.log = log;
 		this.socket = null;
 	}
 
 	start() {
-		if (this.ipv4 && this.ipv6) {
+		if (this.udp4 && this.udp6) {
 			this.socket = dgram.createSocket("udp6");
-		} else if (this.ipv4) {
+		} else if (this.udp4) {
 			this.socket = dgram.createSocket("udp4");
 		} else {
 			this.socket = dgram.createSocket({type: "udp6", ipv6Only: true});
