@@ -6,7 +6,6 @@ const { MStunHeader } = require("./mhdr.js");
 const { MStunAttr } = require("./mattr.js");
 
 class Ministun {
-	// TODO: Make args do something
 	constructor({port = 3478, udp4 = true, udp6 = true, log = console.log, err = console.error} = {}) {
 		if (!port || (!udp4 && !udp6)) {
 			return null;
@@ -31,24 +30,23 @@ class Ministun {
 
 		this.socket.on("listening", () => {
 			const addr = this.socket.address();
-			this.lmsg(`Listening for STUN clients on ${addr.address}:${addr.port}\n`);
+			this.lout(`Listening for STUN clients on ${addr.address}:${addr.port}\n`);
 		});
 
 		this.socket.on("message", this.onMessage.bind(this));
 		this.socket.bind(this.port);
-
-		this.lmsg(`ministun starting...\n`);
+		this.lout(`ministun starting...\n`);
 	}
 
 	stop() {
 		this.socket.on("close", () => {
-			this.lmsg(`ministun stopped\n`);
+			this.lout(`ministun stopped\n`);
 		});
 
 		this.socket.close();
 	}
 
-	lmsg(msg) {
+	lout(msg) {
 		if (this.log === null) {
 			return;
 		}
@@ -72,15 +70,17 @@ class Ministun {
 		}
 
 		if (MStunHeader.decType(inMsg.hdr.type).type === MStunHeader.K_MSG_TYPE.BINDING_REQUEST) {
-			this.lmsg(`Binding request received from ${rinfo.address}:${rinfo.port}\n`);
+			this.lout(`Binding request received from ${rinfo.address}:${rinfo.port}\n`);
+
+			const mtype = !inMsg.rfc3489 ? MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS : MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS;
 
 			const attrs = [
-				new MStunAttr(MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, inMsg.hdr.id]),
+				new MStunAttr(mtype, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, inMsg.hdr.id]),
 				new MStunAttr(MStunAttr.K_ATTR_TYPE.SOFTWARE)
 			];
 
 			const outHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunMsg.attrByteLength(attrs), inMsg.hdr.id);
-			const outMsg = new MStunMsg(outHdr, attrs);
+			const outMsg = new MStunMsg({hdr: outHdr, attrs: attrs});
 
 			this.socket.send(outMsg.serialize(), rinfo.port, rinfo.address, (err) => {
 			 	if (err) {
@@ -88,7 +88,7 @@ class Ministun {
 			 		return;
 			 	}
 
-			 	this.lmsg(`Sent binding success response to ${rinfo.address}:${rinfo.port}\n`);
+			 	this.lout(`Sent binding success response to ${rinfo.address}:${rinfo.port}\n`);
 			});
 		}
 	}

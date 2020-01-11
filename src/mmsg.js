@@ -1,19 +1,14 @@
 const { MStunHeader } = require("./mhdr.js");
 
 class MStunMsg {
-	constructor(hdr = null, attrs = []) {
+	constructor({hdr = null, attrs = [], rfc3489 = false} = {}) {
 		this.hdr = hdr;
 		this.attr = attrs;
+		this.rfc3489 = rfc3489;
 	}
 
 	static from(buf) {
 		if (!Buffer.isBuffer(buf) || buf.length < MStunHeader.K_HDR_LEN || !MStunHeader.isValidMsb(buf)) {
-			return null;
-		}
-
-		const magic = buf.slice(MStunHeader.K_MAGIC_OFF[0], MStunHeader.K_MAGIC_OFF[1]);
-
-		if (!MStunHeader.isValidMagic(magic)) {
 			return null;
 		}
 
@@ -31,13 +26,17 @@ class MStunMsg {
 			return null;
 		}
 
-		const msg = new this;
-		
 		if (dlen > 0) {
-			// Validate attributes, create MStunAttr objects, push em into this.attr
+			// Validate attributes, create MStunAttr objects, push em into an array
 		}
 
-		msg.hdr = MStunHeader.from(type, len, id, magic);
+		const magic = buf.slice(MStunHeader.K_MAGIC_OFF[0], MStunHeader.K_MAGIC_OFF[1]);
+		
+		const msg = new this({
+			hdr: MStunHeader.from(type, len, id, magic),
+			rfc3489: !MStunHeader.isValidMagic(magic)
+		});
+		
 		return msg;
 	}
 
