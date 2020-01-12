@@ -29,7 +29,6 @@ class MStunMsg {
 
 		const attrs = [];
 
-		// Messages may possess unknown attributes, so we won't validate
 		if (msglen > 0) {
 			let attrptr = MStunHeader.K_HDR_LEN;
 

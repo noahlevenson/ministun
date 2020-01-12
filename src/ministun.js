@@ -69,6 +69,17 @@ class Ministun {
 			return;
 		}
 
+		if (inMsg.attrs.length > 0) {
+			const badAttrs = attrs.some((attr) => {
+				return (MStunAttr.decType(attr.type) === MStunAttr.K_ATTR_TYPE.MALFORMED && MStunAttr.isCompReq(attr.type));
+			});
+
+			if (badAttrs) {
+				// Per RFC 5389, send the client a message containing ERROR_CODE and UNKNOWN_ATTRIBUTES
+				// this behavior also ensures RFC 3489 compliance (in case we see any RESPONSE_ADDRESS or CHANGE_REQUEST attrs)
+			}
+		}
+
 		if (MStunHeader.decType(inMsg.hdr.type).type === MStunHeader.K_MSG_TYPE.BINDING_REQUEST) {
 			this.lout(`Binding request received from ${rinfo.address}:${rinfo.port}\n`);
 
