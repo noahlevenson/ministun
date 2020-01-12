@@ -69,15 +69,27 @@ class Ministun {
 			return;
 		}
 
-		if (inMsg.attrs.length > 0) {
-			const badAttrs = attrs.some((attr) => {
-				return (MStunAttr.decType(attr.type) === MStunAttr.K_ATTR_TYPE.MALFORMED && MStunAttr.isCompReq(attr.type));
-			});
+		const badAttrTypes = [];
 
-			if (badAttrs) {
-				// Per RFC 5389, send the client a message containing ERROR_CODE and UNKNOWN_ATTRIBUTES
-				// this behavior also ensures RFC 3489 compliance (in case we see any RESPONSE_ADDRESS or CHANGE_REQUEST attrs)
+		inMsg.attrs.forEach((attr) => {
+			if (MStunAttr.dectype(attr.type === MStunAttr.K_ATTR_TYPE.MALFORMED && MStunAttr.isCompReq(attr.type))) {
+				badAttrTypes.push(attr.type);
 			}
+		});
+
+		if (badAttrTypes.length > 0) {
+			// Per RFC 5389, send the client a message containing ERROR_CODE and UNKNOWN_ATTRIBUTES
+			// this behavior also ensures RFC 3489 compliance (in case we see any RESPONSE_ADDRESS or CHANGE_REQUEST attrs)
+
+			const attrs = [
+				new MStunAttr(MStunAttr.K_ATTR_TYPE.ERROR_CODE, [420]),
+				new MStunAttr(MStunAttr.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, [badAttrTypes])
+			];
+
+			const outHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_ERROR_RESPONSE, MStunMsg.attrByteLength(attrs), inMsg.hdr.id);
+			const outMsg = new MStunMsg({hdr: outHdr, attrs: attrs});
+
+			// Send here
 		}
 
 		if (MStunHeader.decType(inMsg.hdr.type).type === MStunHeader.K_MSG_TYPE.BINDING_REQUEST) {

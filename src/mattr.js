@@ -40,8 +40,8 @@ class MStunAttr {
 		[new Buffer.from([0x00, 0x06]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.USERNAME, new Buffer.from([0x00, 0x06]))],
 		[new Buffer.from([0x00, 0x07]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0007, new Buffer.from([0x00, 0x07]))],
 		[new Buffer.from([0x00, 0x08]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MESSAGE_INTEGRITY, new Buffer.from([0x00, 0x08]))],
-		[new Buffer.from([0x00, 0x09]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ERROR_CODE, new Buffer.from([0x00, 0x09]))],
-		[new Buffer.from([0x00, 0x0A]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, new Buffer.from([0x00, 0x0A]))],
+		[new Buffer.from([0x00, 0x09]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ERROR_CODE, new Buffer.from([0x00, 0x09]), this.enErrorCode)],
+		[new Buffer.from([0x00, 0x0A]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, new Buffer.from([0x00, 0x0A]), this.enUnknownAttr)],
 		[new Buffer.from([0x00, 0x0B]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_000B, new Buffer.from([0x00, 0x0B]))],
 		[new Buffer.from([0x00, 0x14]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.REALM, new Buffer.from([0x00, 0x14]))],
 		[new Buffer.from([0x00, 0x15]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.NONCE, new Buffer.from([0x00, 0x15]))],
@@ -61,6 +61,15 @@ class MStunAttr {
 		[new Buffer.from([0x01]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv4, new Buffer.from([0x01]))],
 		[new Buffer.from([0x02]).toString("hex"), new MTypeData(this.K_ADDR_FAMILY.IPv6, new Buffer.from([0x02]))]
 	]);
+
+	static K_ERROR_CODE = {
+		300: "Try Alternate",
+		400: "Bad Request",
+		401: "Unauthorized",
+		420: "Unknown Attribute",
+		438: "Stale Nonce",
+		500: "Server Error"
+	};
 
 	static K_SOFTWARE = Buffer.from("ministun by Noah Levenson");
 
@@ -182,6 +191,23 @@ class MStunAttr {
 		}
 		
 		return Buffer.concat([zero, fam, port, addr]);
+	}
+
+	static enErrorCode(code) {
+		const reservedClass = Buffer.alloc(3);
+		reservedClass[2] = Math.floor(code / 100);
+		
+		const num = Buffer.from([code % 100]); 
+		const phrase = Buffer.from(MStunAttr.K_ERROR_CODE[code]);
+
+		return Buffer.concat([reservedClass, num, phrase]);
+	}
+
+	// Expecting an array of 2-element buffers, any length
+	static enUnknownAttr(types) {
+		return Buffer.concat(types.map((type) => { 
+			return Buffer.from(type);
+		}));
 	}
 
 	static enSoftware() {
