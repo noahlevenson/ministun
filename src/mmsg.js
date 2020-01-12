@@ -3,7 +3,7 @@ const { MStunHeader } = require("./mhdr.js");
 class MStunMsg {
 	constructor({hdr = null, attrs = [], rfc3489 = false} = {}) {
 		this.hdr = hdr;
-		this.attr = attrs;
+		this.attrs = attrs;
 		this.rfc3489 = rfc3489;
 	}
 
@@ -20,20 +20,35 @@ class MStunMsg {
 
 		const id = buf.slice(MStunHeader.K_ID_OFF[0], MStunHeader.K_ID_OFF[1]);
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
-		const dlen = MStunHeader.decLen(len);
+		const msglen = MStunHeader.decLen(len);
+		const attrslen = buf.length - MStunHeader.K_HDR_LEN;
 
-		if (dlen !== buf.length - MStunHeader.K_HDR_LEN) {
+		if (msglen !== attrslen) {
 			return null;
 		}
 
-		if (dlen > 0) {
-			// Validate attributes, create MStunAttr objects, push em into an array
+		const attrs = [];
+
+		// Messages may possess unknown attributes, so we won't validate
+		if (msglen > 0) {
+			let attrptr = MStunHeader.K_HDR_LEN;
+
+			while (attrptr < attrslen) {
+				const atype = buf.slice(attrptr + MStunAttr.K_TYPE_OFF[0], attrptr + MStunAttr.K_TYPE_OFF[1]);
+				const alen = buf.slice(attrptr + MStunAttr.K_LEN_OFF[0], MStunAttr.K_LEN_OFF[1]);
+				const alendec = MStunAttr.decLen(alen);
+				const aval = buf.slice(attrptr + MStunAttr.K_LEN_OFF[1], attrptr + alendec);
+				
+				attrs.push(MStunAttr.from(atype, alen, aval));
+				attrptr += alendec
+			}
 		}
 
 		const magic = buf.slice(MStunHeader.K_MAGIC_OFF[0], MStunHeader.K_MAGIC_OFF[1]);
 		
 		const msg = new this({
 			hdr: MStunHeader.from(type, len, id, magic),
+			attrs: attrs,
 			rfc3489: !MStunHeader.isValidMagic(magic)
 		});
 		
@@ -47,7 +62,7 @@ class MStunMsg {
 	}
 
 	serialize() {
-		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attr.map((attr) => { 
+		return Buffer.concat([this.hdr.serialize(), Buffer.concat(this.attrs.map((attr) => { 
 			return attr.serialize(); 
 		}))]);
 	}

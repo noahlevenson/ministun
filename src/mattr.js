@@ -3,6 +3,8 @@ const { MStunHeader } = require("./mhdr.js");
 const { MTypeData } = require("./mcontainer.js");
 
 class MStunAttr {
+	static K_TYPE_LEN = 2;
+	static K_LEN_LEN = 2;
 	static K_TYPE_OFF = [0, 2]; 
 	static K_LEN_OFF = [2, 4];
 
@@ -73,6 +75,17 @@ class MStunAttr {
 		this.type = MStunAttr.enType(type);
 		this.val = Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args);
 		this.len = MStunAttr.enLen(this.val.length);
+	}
+
+	// TODO: Validation
+	static from(type, len, val) {
+		const attr = new this;
+
+		this.type = type;
+		this.len = len;
+		this.val = val;
+
+		return attr;
 	}
 
 	static decType(type) {
