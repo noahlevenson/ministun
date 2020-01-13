@@ -1,4 +1,5 @@
 const { MStunHeader } = require("./mhdr.js");
+const { MStunAttr } = require("./mattr.js");
 
 class MStunMsg {
 	constructor({hdr = null, attrs = [], rfc3489 = false} = {}) {
@@ -21,9 +22,8 @@ class MStunMsg {
 		const id = buf.slice(MStunHeader.K_ID_OFF[0], MStunHeader.K_ID_OFF[1]);
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
 		const msglen = MStunHeader.decLen(len);
-		const attrslen = buf.length - MStunHeader.K_HDR_LEN;
 
-		if (msglen !== attrslen) {
+		if (msglen !== buf.length - MStunHeader.K_HDR_LEN) {
 			return null;
 		}
 
@@ -32,14 +32,13 @@ class MStunMsg {
 		if (msglen > 0) {
 			let attrptr = MStunHeader.K_HDR_LEN;
 
-			while (attrptr < attrslen) {
+			while (attrptr < buf.length) {
 				const atype = buf.slice(attrptr + MStunAttr.K_TYPE_OFF[0], attrptr + MStunAttr.K_TYPE_OFF[1]);
-				const alen = buf.slice(attrptr + MStunAttr.K_LEN_OFF[0], MStunAttr.K_LEN_OFF[1]);
-				const alendec = MStunAttr.decLen(alen);
-				const aval = buf.slice(attrptr + MStunAttr.K_LEN_OFF[1], attrptr + alendec);
-				
+				const alen = buf.slice(attrptr + MStunAttr.K_LEN_OFF[0], attrptr + MStunAttr.K_LEN_OFF[1]);
+				const vlen = MStunAttr.decLen(alen);
+				const aval = buf.slice(attrptr + MStunAttr.K_LEN_OFF[1], attrptr + MStunAttr.K_LEN_OFF[1] + vlen);
 				attrs.push(MStunAttr.from(atype, alen, aval));
-				attrptr += alendec
+				attrptr += (vlen + MStunAttr.K_TYPE_LEN + MStunAttr.K_LEN_LEN);
 			}
 		}
 
@@ -50,7 +49,7 @@ class MStunMsg {
 			attrs: attrs,
 			rfc3489: !MStunHeader.isValidMagic(magic)
 		});
-		
+
 		return msg;
 	}
 

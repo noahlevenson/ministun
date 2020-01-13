@@ -77,7 +77,8 @@ class MStunAttr {
 	constructor(type = null, args = []) {
 		if (type === null) {
 			this.type = null;
-			this.args = [];
+			this.len = null;
+			this.val = null;
 			return;
 		}
 
@@ -90,9 +91,9 @@ class MStunAttr {
 	static from(type, len, val) {
 		const attr = new this;
 
-		this.type = type;
-		this.len = len;
-		this.val = val;
+		attr.type = type;
+		attr.len = len;
+		attr.val = val;
 
 		return attr;
 	}
