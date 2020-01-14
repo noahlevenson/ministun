@@ -1,5 +1,6 @@
 const { MStunHeader } = require("./mhdr.js");
 const { MStunAttr } = require("./mattr.js");
+const { MUtil } = require("./mutil.js"); 
 
 class MStunMsg {
 	constructor({hdr = null, attrs = [], rfc3489 = false} = {}) {
@@ -19,8 +20,13 @@ class MStunMsg {
 			return null;
 		}
 
-		const id = buf.slice(MStunHeader.K_ID_OFF[0], MStunHeader.K_ID_OFF[1]);
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
+
+		// Attributes are padded to multiples of 4 bytes, so the 2 least significant bits of the msg length must be zero
+		if (MUtil.getBit(len, len.length - 1, 0) !== 0 || MUtil.getBit(len, len.length - 1, 1) !== 0) {
+			return null;
+		}
+		
 		const msglen = MStunHeader.decLen(len);
 
 		if (msglen !== buf.length - MStunHeader.K_HDR_LEN) {
@@ -42,6 +48,7 @@ class MStunMsg {
 			}
 		}
 
+		const id = buf.slice(MStunHeader.K_ID_OFF[0], MStunHeader.K_ID_OFF[1]);
 		const magic = buf.slice(MStunHeader.K_MAGIC_OFF[0], MStunHeader.K_MAGIC_OFF[1]);
 		
 		const msg = new this({

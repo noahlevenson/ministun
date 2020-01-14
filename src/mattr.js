@@ -3,10 +3,10 @@ const { MStunHeader } = require("./mhdr.js");
 const { MTypeData } = require("./mcontainer.js");
 
 class MStunAttr {
-	static K_TYPE_LEN = 2;
-	static K_LEN_LEN = 2;
 	static K_TYPE_OFF = [0, 2]; 
 	static K_LEN_OFF = [2, 4];
+	static K_LEN_LEN = this.K_LEN_OFF[1] - this.K_LEN_OFF[0]; 
+	static K_TYPE_LEN = this.K_TYPE_OFF[1] - this.K_TYPE_OFF[0];
 
 	static K_ATTR_TYPE = {
 		RESERVED_0000: 0,

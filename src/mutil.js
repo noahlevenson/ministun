@@ -11,11 +11,12 @@ class MUtil {
 		return buf;
 	}
 
+	// Little endian addressing
 	static getBit(buffer, idx, off) {
 		let mask = Buffer.alloc(1);
 
-		mask[0] = 0b10000000;
-		mask[0] >>>= off;
+		mask[0] = 0x01;
+		mask[0] <<= off;
 
 		return (buffer[idx] & mask[0]) !== 0 ? 1 : 0;
 	}

@@ -51,10 +51,8 @@ class MStunHeader {
 	}
 
 	static isValidMsb(buf) {
-		for (let i = 0; i < 2; i += 1) {
-			if (MUtil.getBit(buf, 0, i) !== 0) {
-				return false;
-			}
+		if (MUtil.getBit(buf, 0, 6) !== 0 || MUtil.getBit(buf, 0, 7) !== 0) {
+			return false;
 		}
 
 		return true;
