@@ -64,7 +64,7 @@ class MStunHeader {
 			return dtype;
 		}
 		
-		return this.K_MSG_TYPE.MALFORMED;
+		return new MTypeData(this.K_MSG_TYPE.MALFORMED);
 	}
 
 	static decLen(len) {
@@ -78,7 +78,7 @@ class MStunHeader {
 	// TODO: Validate input
 	static enType(type) {
 		const tdata = Array.from(this.K_MSG_TYPE_TABLE.values())[type];
-		return tdata.bin;
+		return Buffer.from(tdata.bin);
 	}
 
 	static enLen(len) {

@@ -16,7 +16,7 @@ class MStunMsg {
 
 		const type = buf.slice(MStunHeader.K_TYPE_OFF[0], MStunHeader.K_TYPE_OFF[1]);
 
-		if (MStunHeader.decType(type) === MStunHeader.K_MSG_TYPE.MALFORMED) {
+		if (MStunHeader.decType(type).type === MStunHeader.K_MSG_TYPE.MALFORMED) {
 			return null;
 		}
 

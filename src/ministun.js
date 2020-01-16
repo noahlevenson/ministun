@@ -6,7 +6,7 @@ const { MStunHeader } = require("./mhdr.js");
 const { MStunAttr } = require("./mattr.js");
 
 class Ministun {
-	constructor({port = 3478, udp4 = true, udp6 = true, log = console.log, err = console.error} = {}) {
+	constructor({port = 3478, udp4 = true, udp6 = true, log = console.log, err = console.error, sw = true} = {}) {
 		if (!port || (!udp4 && !udp6)) {
 			return null;
 		}
@@ -16,6 +16,7 @@ class Ministun {
 		this.port = port;
 		this.log = log;
 		this.err = err;
+		this.sw = sw;
 		this.socket = null;
 	}
 
@@ -112,13 +113,14 @@ class Ministun {
 			const attrs = [
 				new MStunAttr({
 					type: mtype, 
-					args: [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, inMsg.hdr.id]
-				}),
-				new MStunAttr({
-					type: MStunAttr.K_ATTR_TYPE.SOFTWARE
+					args: [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, !inMsg.rfc3489, inMsg.hdr.id]
 				})
 			];
 
+			if (this.sw) {
+				attrs.push(new MStunAttr({type: MStunAttr.K_ATTR_TYPE.SOFTWARE}));
+			}
+			
 			const outHdr = new MStunHeader({
 				type: MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, 
 				len: MStunMsg.attrByteLength(attrs), 

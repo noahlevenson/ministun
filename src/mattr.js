@@ -1,8 +1,9 @@
-const { MUtil } = require("./mutil.js"); 
 const { MStunHeader } = require("./mhdr.js");
 const { MTypeData } = require("./mcontainer.js");
+const { MUtil } = require("./mutil.js"); 
 
 class MStunAttr {
+	static K_SOFTWARE = "ministun by Noah Levenson";
 	static K_TYPE_OFF = [0, 2]; 
 	static K_LEN_OFF = [2, 4];
 	static K_LEN_LEN = this.K_LEN_OFF[1] - this.K_LEN_OFF[0]; 
@@ -45,7 +46,7 @@ class MStunAttr {
 		[new Buffer.from([0x00, 0x0B]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_000B, new Buffer.from([0x00, 0x0B]))],
 		[new Buffer.from([0x00, 0x14]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.REALM, new Buffer.from([0x00, 0x14]))],
 		[new Buffer.from([0x00, 0x15]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.NONCE, new Buffer.from([0x00, 0x15]))],
-		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, new Buffer.from([0x00, 0x20]), this.enXorMappedAddr)],
+		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, new Buffer.from([0x00, 0x20]), this.enMappedAddr)],
 		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, new Buffer.from([0x80, 0x22]), this.enSoftware)],
 		[new Buffer.from([0x80, 0x23]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ALTERNATE_SERVER, new Buffer.from([0x80, 0x23]))],
 		[new Buffer.from([0x80, 0x28]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.FINGERPRINT, new Buffer.from([0x80, 0x28]))]
@@ -70,8 +71,6 @@ class MStunAttr {
 		438: "Stale Nonce",
 		500: "Server Error"
 	};
-
-	static K_SOFTWARE = Buffer.from("ministun by Noah Levenson");
 
 	// TODO: Validation
 	constructor({type = null, args = []} = {}) {
@@ -131,7 +130,7 @@ class MStunAttr {
 	// TODO: Validate input
 	static enType(type) {
 		const tdata = Array.from(this.K_ATTR_TYPE_TABLE.values())[type];
-		return tdata.bin;
+		return Buffer.from(tdata.bin);
 	}
 
 	// TODO: Validate input
@@ -142,11 +141,11 @@ class MStunAttr {
 	// TODO: Validate input
 	static enFam(fam) {
 		const tdata = Array.from(this.K_ADDR_FAMILY_TABLE.values())[fam];
-		return tdata.bin;
+		return Buffer.from(tdata.bin);
 	}
 
 	// TODO: Validate input
-	static enMappedAddr(famType, addrStr, portInt) {
+	static enMappedAddr(famType, addrStr, portInt, xor = false, id) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr.enFam(famType);
 		const port = MUtil.int2Buf16(portInt);
@@ -158,32 +157,18 @@ class MStunAttr {
 			addr = MUtil.ipv6Str2Buf128(addrStr);
 		}
 
-		return Buffer.concat([zero, fam, port, addr]);
-	}
+		if (xor) {
+			for (let i = 0; i < port.length; i += 1) {
+				port[i] ^= MStunHeader.K_MAGIC[i]; 
+			}
 
-	// TODO: Validate input
-	static enXorMappedAddr(famType, addrStr, portInt, id) {
-		const zero = Buffer.alloc(1);
-		const fam = MStunAttr.enFam(famType);
-		const port = MUtil.int2Buf16(portInt);
-		let addr;
+			const c = Buffer.concat([MStunHeader.K_MAGIC, id]);
 
-		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
-			addr = MUtil.ipv4Str2Buf32(addrStr);
-		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
-			addr = MUtil.ipv6Str2Buf128(addrStr);
+			for (let i = 0; i < addr.length; i += 1) {
+				addr[i] ^= c[i];
+			}
 		}
 
-		for (let i = 0; i < port.length; i += 1) {
-			port[i] ^= MStunHeader.K_MAGIC[i]; 
-		}
-
-		const c = Buffer.concat([MStunHeader.K_MAGIC, id]); 
-
-		for (let i = 0; i < addr.length; i += 1) {
-			addr[i] ^= c[i];
-		}
-		
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 
@@ -205,7 +190,7 @@ class MStunAttr {
 	}
 
 	static enSoftware() {
-		return MStunAttr.K_SOFTWARE;
+		return Buffer.from(MStunAttr.K_SOFTWARE);
 	}	
 
 	length() {

@@ -45,10 +45,11 @@ class MUtil {
 	// Can we assume that dgram delivers only valid ipv6 strings and avoid performing validation here?
 	static ipv6Str2Buf128(str) {
 		const arr = str.split(":");
+		const len = arr.length - 1;
 
 		// It's an ipv4 mapped ipv6 address
-		if (net.isIPv4(arr[arr.length - 1]) && arr[arr.length - 2].toUpperCase() === "FFFF") {
-			arr[arr.length - 1] = arr[arr.length - 1].split(".").map((n) => {
+		if (net.isIPv4(arr[len]) && arr[len - 1].toUpperCase() === "FFFF") {
+			arr[len] = arr[len].split(".").map((n) => {
 				return parseInt(n).toString(16).padStart(2, "0");
 			}).join("");
 		}
