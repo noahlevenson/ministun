@@ -26,20 +26,15 @@ class MStunHeader {
 	]);
 
 	// TODO: Validation
-	constructor(type = null, len = null, id = Buffer.alloc(MStunHeader.K_ID_LEN), magic = MStunHeader.K_MAGIC) {
-		if (type === null && len === null) {
-			this.type = this.len = this.magic = this.id = null;
-			return;
-		} 
-
-		this.type = MStunHeader.enType(type);
-		this.len = MStunHeader.enLen(len);
-		this.magic = Buffer.from(magic)
-		this.id = Buffer.from(id);
+	constructor({type = null, len = null, id = null, magic = MStunHeader.K_MAGIC} = {}) {
+		this.type = type ? MStunHeader.enType(type) : type;
+		this.len = len ? MStunHeader.enLen(len) : len;
+		this.magic = Buffer.from(magic);
+		this.id = id ? Buffer.from(id) : id;
 	}
 
 	// TODO: Validation
-	static from(type, len, id, magic) {
+	static from({type = null, len = null, id = null, magic = MStunHeader.K_MAGIC} = {}) {
 		const hdr = new this;
 
 		hdr.type = type;

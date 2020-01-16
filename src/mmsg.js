@@ -52,7 +52,7 @@ class MStunMsg {
 		const magic = buf.slice(MStunHeader.K_MAGIC_OFF[0], MStunHeader.K_MAGIC_OFF[1]);
 		
 		const msg = new this({
-			hdr: MStunHeader.from(type, len, id, magic),
+			hdr: MStunHeader.from({type: type, len: len, id: id, magic: magic}),
 			attrs: attrs,
 			rfc3489: !MStunHeader.isValidMagic(magic)
 		});

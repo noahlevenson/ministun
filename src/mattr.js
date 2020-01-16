@@ -74,21 +74,14 @@ class MStunAttr {
 	static K_SOFTWARE = Buffer.from("ministun by Noah Levenson");
 
 	// TODO: Validation
-	constructor(type = null, args = []) {
-		if (type === null) {
-			this.type = null;
-			this.len = null;
-			this.val = null;
-			return;
-		}
-
-		this.type = MStunAttr.enType(type);
-		this.val = Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args);
-		this.len = MStunAttr.enLen(this.val.length);
+	constructor({type = null, args = []} = {}) {
+		this.type = type ? MStunAttr.enType(type) : type;
+		this.val = type ? Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args) : null;
+		this.len = type ? MStunAttr.enLen(this.val.length) : null;
 	}
 
 	// TODO: Validation
-	static from(type, len, val) {
+	static from({type = null, len = null, val = null} = {}) {
 		const attr = new this;
 
 		attr.type = type;

@@ -80,11 +80,22 @@ class Ministun {
 
 		if (badAttrTypes.length > 0) {
 			const attrs = [
-				new MStunAttr(MStunAttr.K_ATTR_TYPE.ERROR_CODE, [420]),
-				new MStunAttr(MStunAttr.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, [badAttrTypes])
+				new MStunAttr({
+					type: MStunAttr.K_ATTR_TYPE.ERROR_CODE, 
+					args: [420]
+				}),
+				new MStunAttr({
+					type: MStunAttr.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, 
+					args: [badAttrTypes]
+				})
 			];
 
-			const outHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_ERROR_RESPONSE, MStunMsg.attrByteLength(attrs), inMsg.hdr.id);
+			const outHdr = new MStunHeader({
+				type: MStunHeader.K_MSG_TYPE.BINDING_ERROR_RESPONSE, 
+				len: MStunMsg.attrByteLength(attrs), 
+				id: inMsg.hdr.id
+			});
+
 			const outMsg = new MStunMsg({
 				hdr: outHdr, 
 				attrs: attrs
@@ -99,11 +110,21 @@ class Ministun {
 			const mtype = !inMsg.rfc3489 ? MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS : MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS;
 
 			const attrs = [
-				new MStunAttr(mtype, [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, inMsg.hdr.id]),
-				new MStunAttr(MStunAttr.K_ATTR_TYPE.SOFTWARE)
+				new MStunAttr({
+					type: mtype, 
+					args: [MStunAttr.K_ADDR_FAMILY[rinfo.family], rinfo.address, rinfo.port, inMsg.hdr.id]
+				}),
+				new MStunAttr({
+					type: MStunAttr.K_ATTR_TYPE.SOFTWARE
+				})
 			];
 
-			const outHdr = new MStunHeader(MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, MStunMsg.attrByteLength(attrs), inMsg.hdr.id);
+			const outHdr = new MStunHeader({
+				type: MStunHeader.K_MSG_TYPE.BINDING_SUCCESS_RESPONSE, 
+				len: MStunMsg.attrByteLength(attrs), 
+				id: inMsg.hdr.id
+			});
+
 			const outMsg = new MStunMsg({
 				hdr: outHdr, 
 				attrs: attrs
