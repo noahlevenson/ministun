@@ -33,7 +33,7 @@ class MStunAttr {
 
 	static K_ATTR_TYPE_TABLE = new Map([
 		[new Buffer.from([0x00, 0x00]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0000, new Buffer.from([0x00, 0x00]))],
-		[new Buffer.from([0x00, 0x01]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MAPPED_ADDRESS, new Buffer.from([0x00, 0x01]), this.enMappedAddr)],
+		[new Buffer.from([0x00, 0x01]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MAPPED_ADDRESS, new Buffer.from([0x00, 0x01]), this._enMappedAddr)],
 		[new Buffer.from([0x00, 0x02]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0002, new Buffer.from([0x00, 0x02]))],
 		[new Buffer.from([0x00, 0x03]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0003, new Buffer.from([0x00, 0x03]))],
 		[new Buffer.from([0x00, 0x04]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0004, new Buffer.from([0x00, 0x04]))],
@@ -41,13 +41,13 @@ class MStunAttr {
 		[new Buffer.from([0x00, 0x06]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.USERNAME, new Buffer.from([0x00, 0x06]))],
 		[new Buffer.from([0x00, 0x07]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_0007, new Buffer.from([0x00, 0x07]))],
 		[new Buffer.from([0x00, 0x08]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.MESSAGE_INTEGRITY, new Buffer.from([0x00, 0x08]))],
-		[new Buffer.from([0x00, 0x09]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ERROR_CODE, new Buffer.from([0x00, 0x09]), this.enErrorCode)],
-		[new Buffer.from([0x00, 0x0A]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, new Buffer.from([0x00, 0x0A]), this.enUnknownAttr)],
+		[new Buffer.from([0x00, 0x09]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ERROR_CODE, new Buffer.from([0x00, 0x09]), this._enErrorCode)],
+		[new Buffer.from([0x00, 0x0A]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.UNKNOWN_ATTRIBUTES, new Buffer.from([0x00, 0x0A]), this._enUnknownAttr)],
 		[new Buffer.from([0x00, 0x0B]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.RESERVED_000B, new Buffer.from([0x00, 0x0B]))],
 		[new Buffer.from([0x00, 0x14]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.REALM, new Buffer.from([0x00, 0x14]))],
 		[new Buffer.from([0x00, 0x15]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.NONCE, new Buffer.from([0x00, 0x15]))],
-		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, new Buffer.from([0x00, 0x20]), this.enMappedAddr)],
-		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, new Buffer.from([0x80, 0x22]), this.enSoftware)],
+		[new Buffer.from([0x00, 0x20]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.XOR_MAPPED_ADDRESS, new Buffer.from([0x00, 0x20]), this._enMappedAddr)],
+		[new Buffer.from([0x80, 0x22]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.SOFTWARE, new Buffer.from([0x80, 0x22]), this._enSoftware)],
 		[new Buffer.from([0x80, 0x23]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.ALTERNATE_SERVER, new Buffer.from([0x80, 0x23]))],
 		[new Buffer.from([0x80, 0x28]).toString("hex"), new MTypeData(this.K_ATTR_TYPE.FINGERPRINT, new Buffer.from([0x80, 0x28]))]
 	]);
@@ -74,9 +74,9 @@ class MStunAttr {
 
 	// TODO: Validation
 	constructor({type = null, args = []} = {}) {
-		this.type = type ? MStunAttr.enType(type) : type;
+		this.type = type ? MStunAttr._enType(type) : type;
 		this.val = type ? Array.from(MStunAttr.K_ATTR_TYPE_TABLE.values())[type].f(...args) : null;
-		this.len = type ? MStunAttr.enLen(this.val.length) : null;
+		this.len = type ? MStunAttr._enLen(this.val.length) : null;
 	}
 
 	// TODO: Validation
@@ -90,7 +90,7 @@ class MStunAttr {
 		return attr;
 	}
 
-	static isCompReq(type) {
+	static _isCompReq(type) {
 		if (type.readUInt16BE() < 0x8000) {
 			return false;
 		} 
@@ -98,7 +98,7 @@ class MStunAttr {
 		return true;
 	}
 
-	static decType(type) {
+	static _decType(type) {
 		const dtype = this.K_ATTR_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
@@ -109,7 +109,7 @@ class MStunAttr {
 	}
 
 	// TODO: Validate input
-	static decLen(len) {
+	static _decLen(len) {
 		const buf = Uint8Array.from(len);
 		buf.reverse();
 
@@ -117,7 +117,7 @@ class MStunAttr {
 		return view[0];
 	}
 
-	static decFam(fam) {
+	static _decFam(fam) {
 		const dfam = this.K_ADDR_FAMILY_TABLE.get(fam.toString("hex"));
 
 		if (dfam !== undefined) {
@@ -128,33 +128,33 @@ class MStunAttr {
 	}
 
 	// TODO: Validate input
-	static enType(type) {
+	static _enType(type) {
 		const tdata = Array.from(this.K_ATTR_TYPE_TABLE.values())[type];
 		return Buffer.from(tdata.bin);
 	}
 
 	// TODO: Validate input
-	static enLen(len) {
-		return MUtil.int2Buf16(len); 
+	static _enLen(len) {
+		return MUtil._int2Buf16(len); 
 	}
 
 	// TODO: Validate input
-	static enFam(fam) {
+	static _enFam(fam) {
 		const tdata = Array.from(this.K_ADDR_FAMILY_TABLE.values())[fam];
 		return Buffer.from(tdata.bin);
 	}
 
 	// TODO: Validate input
-	static enMappedAddr(famType, addrStr, portInt, xor = false, id) {
+	static _enMappedAddr(famType, addrStr, portInt, xor = false, id) {
 		const zero = Buffer.alloc(1);
-		const fam = MStunAttr.enFam(famType);
-		const port = MUtil.int2Buf16(portInt);
+		const fam = MStunAttr._enFam(famType);
+		const port = MUtil._int2Buf16(portInt);
 		let addr;
 
 		if (famType === MStunAttr.K_ADDR_FAMILY.IPv4) {
-			addr = MUtil.ipv4Str2Buf32(addrStr);
+			addr = MUtil._ipv4Str2Buf32(addrStr);
 		} else if (famType === MStunAttr.K_ADDR_FAMILY.IPv6) {
-			addr = MUtil.ipv6Str2Buf128(addrStr);
+			addr = MUtil._ipv6Str2Buf128(addrStr);
 		}
 
 		if (xor) {
@@ -172,24 +172,24 @@ class MStunAttr {
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 
-	static enErrorCode(code) {
-		const reservedClass = Buffer.alloc(3);
-		reservedClass[2] = Math.floor(code / 100);
+	static _enErrorCode(code) {
+		const resClass = Buffer.alloc(3);
+		resClass[2] = Math.floor(code / 100);
 		
 		const num = Buffer.from([code % 100]); 
 		const phrase = Buffer.from(MStunAttr.K_ERROR_CODE[code]);
 
-		return Buffer.concat([reservedClass, num, phrase]);
+		return Buffer.concat([resClass, num, phrase]);
 	}
 
 	// Expecting an array of 2-element buffers, any length
-	static enUnknownAttr(types) {
+	static _enUnknownAttr(types) {
 		return Buffer.concat(types.map((type) => { 
 			return Buffer.from(type);
 		}));
 	}
 
-	static enSoftware() {
+	static _enSoftware() {
 		return Buffer.from(MStunAttr.K_SOFTWARE);
 	}	
 

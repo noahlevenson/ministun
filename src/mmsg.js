@@ -10,24 +10,24 @@ class MStunMsg {
 	}
 
 	static from(buf) {
-		if (!Buffer.isBuffer(buf) || buf.length < MStunHeader.K_HDR_LEN || !MStunHeader.isValidMsb(buf)) {
+		if (!Buffer.isBuffer(buf) || buf.length < MStunHeader.K_HDR_LEN || !MStunHeader._isValidMsb(buf)) {
 			return null;
 		}
 
 		const type = buf.slice(MStunHeader.K_TYPE_OFF[0], MStunHeader.K_TYPE_OFF[1]);
 
-		if (MStunHeader.decType(type).type === MStunHeader.K_MSG_TYPE.MALFORMED) {
+		if (MStunHeader._decType(type).type === MStunHeader.K_MSG_TYPE.MALFORMED) {
 			return null;
 		}
 
 		const len = buf.slice(MStunHeader.K_LEN_OFF[0], MStunHeader.K_LEN_OFF[1]);
 
 		// Attributes are padded to multiples of 4 bytes, so the 2 least significant bits of the msg length must be zero
-		if (MUtil.getBit(len, len.length - 1, 0) !== 0 || MUtil.getBit(len, len.length - 1, 1) !== 0) {
+		if (MUtil._getBit(len, len.length - 1, 0) !== 0 || MUtil._getBit(len, len.length - 1, 1) !== 0) {
 			return null;
 		}
 		
-		const msglen = MStunHeader.decLen(len);
+		const msglen = MStunHeader._decLen(len);
 
 		if (msglen !== buf.length - MStunHeader.K_HDR_LEN) {
 			return null;
@@ -41,7 +41,7 @@ class MStunMsg {
 			while (attrptr < buf.length) {
 				const atype = buf.slice(attrptr + MStunAttr.K_TYPE_OFF[0], attrptr + MStunAttr.K_TYPE_OFF[1]);
 				const alen = buf.slice(attrptr + MStunAttr.K_LEN_OFF[0], attrptr + MStunAttr.K_LEN_OFF[1]);
-				const vlen = MStunAttr.decLen(alen);
+				const vlen = MStunAttr._decLen(alen);
 				const aval = buf.slice(attrptr + MStunAttr.K_LEN_OFF[1], attrptr + MStunAttr.K_LEN_OFF[1] + vlen);
 				attrs.push(MStunAttr.from(atype, alen, aval));
 				attrptr += (vlen + MStunAttr.K_TYPE_LEN + MStunAttr.K_LEN_LEN);
@@ -54,13 +54,13 @@ class MStunMsg {
 		const msg = new this({
 			hdr: MStunHeader.from({type: type, len: len, id: id, magic: magic}),
 			attrs: attrs,
-			rfc3489: !MStunHeader.isValidMagic(magic)
+			rfc3489: !MStunHeader._isValidMagic(magic)
 		});
 
 		return msg;
 	}
 
-	static attrByteLength(attrs) {
+	static _attrByteLength(attrs) {
 		return attrs.reduce((sum, attr) => {
 			return sum + attr.length();
 		}, 0);

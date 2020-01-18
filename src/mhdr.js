@@ -27,8 +27,8 @@ class MStunHeader {
 
 	// TODO: Validation
 	constructor({type = null, len = null, id = null, magic = MStunHeader.K_MAGIC} = {}) {
-		this.type = type ? MStunHeader.enType(type) : type;
-		this.len = len ? MStunHeader.enLen(len) : len;
+		this.type = type ? MStunHeader._enType(type) : type;
+		this.len = len ? MStunHeader._enLen(len) : len;
 		this.magic = Buffer.from(magic);
 		this.id = id ? Buffer.from(id) : id;
 	}
@@ -45,19 +45,19 @@ class MStunHeader {
 		return hdr;
 	}
 
-	static isValidMsb(buf) {
-		if (MUtil.getBit(buf, 0, 6) !== 0 || MUtil.getBit(buf, 0, 7) !== 0) {
+	static _isValidMsb(buf) {
+		if (MUtil._getBit(buf, 0, 6) !== 0 || MUtil._getBit(buf, 0, 7) !== 0) {
 			return false;
 		}
 
 		return true;
 	}
 
-	static isValidMagic(magic) {
-		return MUtil.compareBuf(magic, this.K_MAGIC);
+	static _isValidMagic(magic) {
+		return MUtil._compareBuf(magic, this.K_MAGIC);
 	}
 
-	static decType(type) {
+	static _decType(type) {
 		const dtype = this.K_MSG_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
@@ -67,7 +67,7 @@ class MStunHeader {
 		return new MTypeData(this.K_MSG_TYPE.MALFORMED);
 	}
 
-	static decLen(len) {
+	static _decLen(len) {
 		const buf = Uint8Array.from(len);
 		buf.reverse();
 		
@@ -76,13 +76,13 @@ class MStunHeader {
 	}
 
 	// TODO: Validate input
-	static enType(type) {
+	static _enType(type) {
 		const tdata = Array.from(this.K_MSG_TYPE_TABLE.values())[type];
 		return Buffer.from(tdata.bin);
 	}
 
-	static enLen(len) {
-		return MUtil.int2Buf16(len); 
+	static _enLen(len) {
+		return MUtil._int2Buf16(len); 
 	}
 
 	serialize() {

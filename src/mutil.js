@@ -2,7 +2,7 @@ const net = require("net");
 
 class MUtil {
 	// TODO: Validate arg < 0xFFFF?
-	static int2Buf16(int) {
+	static _int2Buf16(int) {
 		const buf = Buffer.alloc(2);
 
 		buf[0] = 0xFF & (int >>> 8);
@@ -12,7 +12,7 @@ class MUtil {
 	}
 
 	// Little endian addressing
-	static getBit(buffer, idx, off) {
+	static _getBit(buffer, idx, off) {
 		let mask = Buffer.alloc(1);
 
 		mask[0] = 0x01;
@@ -21,7 +21,7 @@ class MUtil {
 		return (buffer[idx] & mask[0]) !== 0 ? 1 : 0;
 	}
 
-	static compareBuf(a, b) {
+	static _compareBuf(a, b) {
 		if (a.length !== b.length) {
 			return false;
 		}
@@ -36,14 +36,14 @@ class MUtil {
 	}
 
 	// Can we assume that dgram delivers only valid ipv4 strings and avoid performing validation here?
-	static ipv4Str2Buf32(str) {
+	static _ipv4Str2Buf32(str) {
 		return Buffer.from(str.split(".").map((n) => { 
 			return parseInt(n); 
 		}));
 	}
 
 	// Can we assume that dgram delivers only valid ipv6 strings and avoid performing validation here?
-	static ipv6Str2Buf128(str) {
+	static _ipv6Str2Buf128(str) {
 		const arr = str.split(":");
 		const len = arr.length - 1;
 
