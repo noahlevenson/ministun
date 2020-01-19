@@ -1,0 +1,19 @@
+{
+  "name": "ministun",
+  "version": "0.0.1",
+  "description": "Zero dependency STUN server in ~500 lines",
+  "main": "src/ministun.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noahlevenson/ministun.git"
+  },
+  "author": "Noah Levenson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noahlevenson/ministun/issues"
+  },
+  "homepage": "https://github.com/noahlevenson/ministun#readme"
+}

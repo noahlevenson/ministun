@@ -1,3 +1,12 @@
+/**
+ * ministun: Zero dependency STUN server for Node.js
+ *
+ * by Noah Levenson <noahlevenson@gmail.com>
+ * 
+ * mhdr.js 
+ * STUN message header
+ */
+
 const { MUtil } = require("./mutil.js"); 
 const { MTypeData } = require("./mcontainer.js");
 

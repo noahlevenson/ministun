@@ -1,3 +1,12 @@
+/**
+ * ministun: Zero dependency STUN server for Node.js
+ *
+ * by Noah Levenson <noahlevenson@gmail.com>
+ * 
+ * mutil.js 
+ * Utility functions
+ */
+
 const net = require("net");
 
 class MUtil {

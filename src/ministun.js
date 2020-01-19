@@ -1,3 +1,12 @@
+/**
+ * ministun: Zero dependency STUN server for Node.js
+ *
+ * by Noah Levenson <noahlevenson@gmail.com>
+ * 
+ * ministun.js 
+ * Main server class
+ */
+
 "use strict";
 
 const dgram = require("dgram");
