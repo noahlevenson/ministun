@@ -100,6 +100,10 @@ class MStunAttr {
 	}
 
 	static _isCompReq(type) {
+		if (!Buffer.isBuffer(type) || type.length !== 2) {
+			throw new Error("type must be Buffer with length of 2");
+		}
+		
 		if (type.readUInt16BE() < 0x8000) {
 			return false;
 		} 
@@ -108,6 +112,10 @@ class MStunAttr {
 	}
 
 	static _decType(type) {
+		if (!Buffer.isBuffer(type) || type.length !== 2) {
+			throw new Error("type must be Buffer with length of 2");
+		}
+
 		const dtype = this.K_ATTR_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
@@ -117,8 +125,11 @@ class MStunAttr {
 		return new MTypeData(this.K_ATTR_TYPE.MALFORMED);
 	}
 
-	// TODO: Validate input
 	static _decLen(len) {
+		if (!Buffer.isBuffer(len) || len.length !== 2) {
+			throw new Error("len must be Buffer with length of 2");
+		}
+
 		const buf = Uint8Array.from(len);
 		buf.reverse();
 
@@ -127,6 +138,10 @@ class MStunAttr {
 	}
 
 	static _decFam(fam) {
+		if (!Buffer.isBuffer(fam) || fam.length !== 1) {
+			throw new Error("fam must be Buffer with length of 1");
+		}
+
 		const dfam = this.K_ADDR_FAMILY_TABLE.get(fam.toString("hex"));
 
 		if (dfam !== undefined) {
@@ -136,20 +151,39 @@ class MStunAttr {
 		return new MTypeData(this.K_ADDR_FAMILY.MALFORMED);
 	}
 
-	// TODO: Validate input
 	static _enType(type) {
+		if (typeof type !== "number") {
+			throw new Error("type must be number");
+		}
+
 		const tdata = Array.from(this.K_ATTR_TYPE_TABLE.values())[type];
+
+		if (!tdata) {
+			throw new Error(`Invalid value for type: ${type}`);
+		}
+
 		return Buffer.from(tdata.bin);
 	}
 
-	// TODO: Validate input
 	static _enLen(len) {
+		if (typeof len !== "number") {
+			throw new Error("len must be number");
+		}
+
 		return MUtil._int2Buf16(len); 
 	}
 
-	// TODO: Validate input
 	static _enFam(fam) {
+		if (typeof fam !== "number") {
+			throw new Error("fam must be number");
+		}
+
 		const tdata = Array.from(this.K_ADDR_FAMILY_TABLE.values())[fam];
+
+		if (!tdata) {
+			throw new Error(`Invalid value for fam: ${fam}`);
+		}
+
 		return Buffer.from(tdata.bin);
 	}
 
