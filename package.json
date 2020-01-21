@@ -4,7 +4,7 @@
   "description": "Zero dependency STUN server in < 1000 lines",
   "main": "src/ministun.js",
   "scripts": {
-    "test": "node tests/mattr.spec.js"
+    "test": "node test/mattr.spec.js"
   },
   "repository": {
     "type": "git",
