@@ -19,7 +19,7 @@ const { MStunAttr } = require("../src/mattr.js");
 
 (function _decType() {
 	assert.throws(() => {
-		MStunAttr._decType(0x1011);
+		MStunAttr._decType(0x0001);
 	});
 
 	assert.throws(() => {
@@ -35,15 +35,15 @@ const { MStunAttr } = require("../src/mattr.js");
 
 (function _decLen() {
 	assert.throws(() => {
-		MStunAttr._decLen(0x1011);
+		MStunAttr._decLen(0x10);
 	});
 
 	assert.throws(() => {
 		MStunAttr._decLen(Buffer.from([0x04]));
 	});
 
-	const res1 = MStunAttr._decLen(Buffer.from([0x00, 0x0F]));
-	assert.strictEqual(res1, 15);
+	const res1 = MStunAttr._decLen(Buffer.from([0x00, 0x10]));
+	assert.strictEqual(res1, 16);
 })();
 
 (function _decFam() {

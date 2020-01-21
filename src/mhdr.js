@@ -55,6 +55,10 @@ class MStunHeader {
 	}
 
 	static _isValidMsb(buf) {
+		if (!Buffer.isBuffer(buf) || buf.length < 1) {
+			throw new Error("buf must be Buffer with a length > 0");
+		}
+
 		if (MUtil._getBit(buf, 0, 6) !== 0 || MUtil._getBit(buf, 0, 7) !== 0) {
 			return false;
 		}
@@ -67,6 +71,10 @@ class MStunHeader {
 	}
 
 	static _decType(type) {
+		if (!Buffer.isBuffer(type) || type.length !== 2) {
+			throw new Error("type must be Buffer with length of 2");
+		}
+
 		const dtype = this.K_MSG_TYPE_TABLE.get(type.toString("hex"));
 
 		if (dtype !== undefined) {
@@ -77,6 +85,10 @@ class MStunHeader {
 	}
 
 	static _decLen(len) {
+		if (!Buffer.isBuffer(len) || len.length !== 2) {
+			throw new Error("len must be Buffer with length of 2");
+		}
+
 		const buf = Uint8Array.from(len);
 		buf.reverse();
 		
@@ -84,13 +96,20 @@ class MStunHeader {
 		return view[0];
 	}
 
-	// TODO: Validate input
 	static _enType(type) {
+		if (typeof type !== "number") {
+			throw new Error("type must be number");
+		}
+
 		const tdata = Array.from(this.K_MSG_TYPE_TABLE.values())[type];
 		return Buffer.from(tdata.bin);
 	}
 
 	static _enLen(len) {
+		if (typeof len !== "number") {
+			throw new Error("len must be number");
+		}
+		
 		return MUtil._int2Buf16(len); 
 	}
 

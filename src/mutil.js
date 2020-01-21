@@ -31,6 +31,10 @@ class MUtil {
 	}
 
 	static _compareBuf(a, b) {
+		if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
+			return false
+		}
+
 		if (a.length !== b.length) {
 			return false;
 		}
