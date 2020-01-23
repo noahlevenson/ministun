@@ -157,5 +157,4 @@ class Ministun {
 	}
 }
 
-const server = new Ministun();
-server.start();
+module.exports.Ministun = Ministun;

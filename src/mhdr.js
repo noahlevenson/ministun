@@ -34,15 +34,15 @@ class MStunHeader {
 		[new Buffer.from([0x01, 0x11]).toString("hex"), new MTypeData(this.K_MSG_TYPE.BINDING_ERROR_RESPONSE, new Buffer.from([0x01, 0x11]))]
 	]);
 
-	// TODO: Validation
+	// TODO: Validation - args must be numbers or Buffers
 	constructor({type = null, len = null, id = null, magic = MStunHeader.K_MAGIC} = {}) {
-		this.type = type ? MStunHeader._enType(type) : type;
-		this.len = len ? MStunHeader._enLen(len) : len;
+		this.type = typeof type === "number" ? MStunHeader._enType(type) : type;
+		this.len = typeof len === "number" ? MStunHeader._enLen(len) : len;
 		this.magic = Buffer.from(magic);
-		this.id = id ? Buffer.from(id) : id;
+		this.id = Buffer.isBuffer(id) ? Buffer.from(id) : id;
 	}
 
-	// TODO: Validation
+	// TODO: Validation - args must be Buffers
 	static from({type = null, len = null, id = null, magic = MStunHeader.K_MAGIC} = {}) {
 		const hdr = new this;
 
