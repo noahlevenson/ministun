@@ -30,30 +30,36 @@ class Ministun {
 	}
 
 	start() {
-		if (this.udp4 && this.udp6) {
-			this.socket = dgram.createSocket("udp6");
-		} else if (this.udp4) {
-			this.socket = dgram.createSocket("udp4");
-		} else {
-			this.socket = dgram.createSocket({type: "udp6", ipv6Only: true});
-		}
+		return new Promise((resolve, reject) => {
+			if (this.udp4 && this.udp6) {
+				this.socket = dgram.createSocket("udp6");
+			} else if (this.udp4) {
+				this.socket = dgram.createSocket("udp4");
+			} else {
+				this.socket = dgram.createSocket({type: "udp6", ipv6Only: true});
+			}
 
-		this.socket.on("listening", () => {
-			const addr = this.socket.address();
-			this._lout(`Listening for STUN clients on ${addr.address}:${addr.port}\n`);
-		});
+			this.socket.on("listening", () => {
+				const addr = this.socket.address();
+				this._lout(`Listening for STUN clients on ${addr.address}:${addr.port}\n`);
+				resolve();
+			});
 
-		this.socket.on("message", this._onMessage.bind(this));
-		this.socket.bind(this.port);
-		this._lout(`ministun starting...\n`);
+			this.socket.on("message", this._onMessage.bind(this));
+			this.socket.bind(this.port);
+			this._lout(`ministun starting...\n`);
+		}); 
 	}
 
 	stop() {
-		this.socket.on("close", () => {
-			this._lout(`ministun stopped\n`);
-		});
+		return new Promise((resolve, reject) => {
+			this.socket.on("close", () => {
+				this._lout(`ministun stopped\n`);
+				resolve();
+			});
 
-		this.socket.close();
+			this.socket.close();
+		});
 	}
 
 	_lout(msg) {

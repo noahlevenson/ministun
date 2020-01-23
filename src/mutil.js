@@ -67,7 +67,7 @@ class MUtil {
 			}).join("");
 		}
 
-		const hs = arr.join("");
+		const hs = arr.join("").padStart(16, "0");
 		const buf = Buffer.alloc(16);
 
 		for (let i = hs.length - 2, j = buf.length - 1; i >= 0; i -= 2, j -= 1) {
