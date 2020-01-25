@@ -91,7 +91,7 @@ function udpTest(v) {
 	await udpTest(4);
 	await udp4server.stop();
 
-	// Travis CI has IPv6 issues
+	// Travis CI doesn't support IPv6
 	// const udp6server = new Ministun({udp4: false, udp6: true});
 	// await udp6server.start();
 	// await udpTest(6);
