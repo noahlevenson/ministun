@@ -12,6 +12,7 @@ const { MTypeData } = require("./mcontainer.js");
 const { MUtil } = require("./mutil.js"); 
 
 class MStunAttr {
+	static K_ALIGN = 4;
 	static K_SOFTWARE = "ministun by Noah Levenson";
 	static K_TYPE_OFF = [0, 2]; 
 	static K_LEN_OFF = [2, 4];
@@ -228,14 +229,23 @@ class MStunAttr {
 
 	// Performs no validation - arg must be array of 2-byte Buffers
 	static _enUnknownAttr(types) {
-		return Buffer.concat(types.map((type) => { 
+		const uknowns = Buffer.concat(types.map((type) => { 
 			return Buffer.from(type);
 		}));
+
+		return MStunAttr._toPadded(uknowns);
 	}
 
-	static _enSoftware() {
-		return Buffer.from(MStunAttr.K_SOFTWARE);
+	static _enSoftware(desc = MStunAttr.K_SOFTWARE) {
+		return MStunAttr._toPadded(Buffer.from(desc));
 	}	
+
+	static _toPadded(buf) {
+		return Buffer.concat([
+			buf,
+			Buffer.alloc(Math.ceil(buf.length / MStunAttr.K_ALIGN) * MStunAttr.K_ALIGN - buf.length)
+		]);
+	}
 
 	length() {
 		return (this.type.length + this.len.length + this.val.length);

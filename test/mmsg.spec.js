@@ -56,5 +56,5 @@ const { MStunMsg } = require("../src/mmsg.js");
 	];
 
 	const res1 = MStunMsg._attrByteLength(attrs);
-	assert.strictEqual(res1, 37);
+	assert.strictEqual(res1, 40);
 })();

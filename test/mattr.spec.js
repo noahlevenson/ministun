@@ -161,11 +161,22 @@ const { MStunAttr } = require("../src/mattr.js");
 
 (function _enUnknownAttr() {
 	const res1 = MStunAttr._enUnknownAttr([Buffer.from([0x00, 0xFF]), Buffer.from([0x7F, 0x7F]), Buffer.from([0x05, 0x06])]);
-	const exp1 = Buffer.from([0x00, 0xFF, 0x7F, 0x7F, 0x05, 0x06]);
+	const exp1 = Buffer.from([0x00, 0xFF, 0x7F, 0x7F, 0x05, 0x06, 0x00, 0x00]);
 
 	assert.strictEqual(res1.length, exp1.length);
 
 	for (let i = 0; i < res1.length; i += 1) {
 		assert.strictEqual(res1[i], exp1[i]);
 	}
+})();
+
+(function _enSoftware() {
+	const res1 = MStunAttr._enSoftware("333");
+	assert.strictEqual(res1.length, 4);
+
+	const res2 = MStunAttr._enSoftware("999999999");
+	assert.strictEqual(res2.length, 12);
+
+	const res3 = MStunAttr._enSoftware("Hello this is a bunch of characters (40)");
+	assert.strictEqual(res3.length, 40);
 })();
