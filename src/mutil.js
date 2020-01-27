@@ -11,6 +11,7 @@ const net = require("net");
 
 class MUtil {
 	// TODO: Validate arg < 0xFFFF?
+	// Network byte order (big endian)
 	static _int2Buf16(int) {
 		const buf = Buffer.alloc(2);
 
@@ -48,14 +49,14 @@ class MUtil {
 		return true;
 	}
 
-	// Can we assume that dgram delivers only valid ipv4 strings and avoid performing validation here?
+	// TODO: Validation?
 	static _ipv4Str2Buf32(str) {
 		return Buffer.from(str.split(".").map((n) => { 
 			return parseInt(n); 
 		}));
 	}
 
-	// Can we assume that dgram delivers only valid ipv6 strings and avoid performing validation here?
+	// TODO: Validation?
 	static _ipv6Str2Buf128(str) {
 		const arr = str.split(":");
 		const len = arr.length - 1;
@@ -70,8 +71,13 @@ class MUtil {
 		const hs = arr.join("").padStart(16, "0");
 		const buf = Buffer.alloc(16);
 
-		for (let i = hs.length - 2, j = buf.length - 1; i >= 0; i -= 2, j -= 1) {
+		let i = hs.length - 2;
+		let j = buf.length - 1;
+
+		while (i >= 0) {
 			buf[j] = parseInt(hs.substring(i, i + 2), 16);
+			i -= 2;
+			j -= 1;
 		}
 
 		return buf;
