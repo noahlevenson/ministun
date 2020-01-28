@@ -44,22 +44,22 @@ async function stopServer() {
 ```
 
 ### Configuration
-- **udp4**: bool (Default: true)
+- **udp4**: bool (Default: true)<br>
 Support UDP over IPv4?
 
-- **udp6**: bool (Default: true)
+- **udp6**: bool (Default: true)<br>
 Support UDP over IPv6?
 
-- **port**: number (Default: 3478)
+- **port**: number (Default: 3478)<br>
 Port number
 
-- **log**: function || null (Default: console.log)
+- **log**: function || null (Default: console.log)<br>
 Log messages will be passed to this function as arg 0, null = no logging 
 
-- **err**: function || null (Default: console.err)
+- **err**: function || null (Default: console.err)<br>
 Error messages will be passed to this function as arg 0, null = no logging 
 
-- **sw**: bool (Default: true)
+- **sw**: bool (Default: true)<br>
 Send the SOFTWARE attribute with binding response messages? 
 
 ### TODO
