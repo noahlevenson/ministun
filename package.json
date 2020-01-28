@@ -11,7 +11,7 @@
     "url": "git+https://github.com/noahlevenson/ministun.git"
   },
   "author": "Noah Levenson",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/noahlevenson/ministun/issues"
   },
