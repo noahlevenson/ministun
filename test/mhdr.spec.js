@@ -1,3 +1,5 @@
+"use strict";
+
 const assert = require("assert");
 const { MStunHeader } = require("../src/mhdr.js"); 
 

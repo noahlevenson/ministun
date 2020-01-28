@@ -1,3 +1,5 @@
+"use strict";
+
 const assert = require("assert");
 const { MStunAttr } = require("../src/mattr.js"); 
 const { MStunMsg } = require("../src/mmsg.js"); 

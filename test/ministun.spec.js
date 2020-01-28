@@ -1,3 +1,5 @@
+"use strict";
+
 const assert = require("assert");
 const p = require("child_process");
 const { Ministun } = require("../src/ministun.js");
