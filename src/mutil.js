@@ -10,7 +10,7 @@
 const net = require("net");
 
 class MUtil {
-	// TODO: Validate arg < 0xFFFF?
+	// TODO: Validation
 	// Network byte order (big endian)
 	static _int2Buf16(int) {
 		const buf = Buffer.alloc(2);
@@ -49,14 +49,14 @@ class MUtil {
 		return true;
 	}
 
-	// TODO: Validation?
+	// TODO: Validation
 	static _ipv4Str2Buf32(str) {
 		return Buffer.from(str.split(".").map((n) => { 
 			return parseInt(n); 
 		}));
 	}
 
-	// TODO: Validation?
+	// TODO: Validation
 	static _ipv6Str2Buf128(str) {
 		const arr = str.split(":");
 		const len = arr.length - 1;

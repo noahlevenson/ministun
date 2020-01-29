@@ -188,7 +188,7 @@ class MStunAttr {
 		return Buffer.from(tdata.bin);
 	}
 
-	// Performs no validation
+	// TODO: Validation
 	static _enMappedAddr(famType, addrStr, portInt, xor = false, id = Buffer.alloc(12)) {
 		const zero = Buffer.alloc(1);
 		const fam = MStunAttr._enFam(famType);
@@ -216,7 +216,7 @@ class MStunAttr {
 		return Buffer.concat([zero, fam, port, addr]);
 	}
 
-	// Performs no validation
+	// TODO: Validation
 	static _enErrorCode(code) {
 		const resClass = Buffer.alloc(3);
 		resClass[2] = Math.floor(code / 100);
@@ -227,7 +227,7 @@ class MStunAttr {
 		return Buffer.concat([resClass, num, phrase]);
 	}
 
-	// Performs no validation - arg must be array of 2-byte Buffers
+	// TODO: Validation
 	static _enUnknownAttr(types) {
 		const uknowns = Buffer.concat(types.map((type) => { 
 			return Buffer.from(type);

@@ -28,7 +28,7 @@ const config = {
 	log: null,
 	err: null,
 	sw: true
-}
+};
 
 const server = new Ministun(config);
 

@@ -69,6 +69,7 @@ class MStunMsg {
 		return msg;
 	}
 
+	// TODO: Validation
 	static _attrByteLength(attrs) {
 		return attrs.reduce((sum, attr) => {
 			return sum + attr.length();

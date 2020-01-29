@@ -85,6 +85,8 @@ class Ministun {
 			return;
 		}
 
+		this._lout(`${Object.keys(MStunHeader.K_MSG_TYPE)[MStunHeader._decType(inMsg.hdr.type).type]} received from ${rinfo.address}:${rinfo.port}\n`);
+
 		// For compliance with RFCs 5389 and 3489, we return an error response for any unknown comprehension required attrs
 		const badAttrTypes = [];
 
@@ -121,8 +123,6 @@ class Ministun {
 		}
 
 		if (MStunHeader._decType(inMsg.hdr.type).type === MStunHeader.K_MSG_TYPE.BINDING_REQUEST) {
-			this._lout(`Binding request received from ${rinfo.address}:${rinfo.port}\n`);
-
 			const mtype = !inMsg.rfc3489 ? MStunAttr.K_ATTR_TYPE.XOR_MAPPED_ADDRESS : MStunAttr.K_ATTR_TYPE.MAPPED_ADDRESS;
 
 			const attrs = [
@@ -158,7 +158,7 @@ class Ministun {
 			 	return;
 			}
 
-			// TODO: Interpret the message type from the stunMsgObj and log a useful message about successfully sending it
+			this._lout(`${Object.keys(MStunHeader.K_MSG_TYPE)[MStunHeader._decType(stunMsgObj.hdr.type).type]} received from ${rinfo.address}:${rinfo.port}\n`);
 		});
 	}
 }
