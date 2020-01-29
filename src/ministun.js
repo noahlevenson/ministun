@@ -163,4 +163,4 @@ class Ministun {
 	}
 }
 
-module.exports.Ministun = Ministun;
+module.exports = Ministun;
