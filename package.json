@@ -1,6 +1,6 @@
 {
   "name": "ministun",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Zero dependency STUN server in < 1000 lines",
   "main": "src/ministun.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/noahlevenson/ministun.git"
   },
-  "author": "Noah Levenson",
+  "author": "Noah Levenson (https://noahlevenson.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/noahlevenson/ministun/issues"
