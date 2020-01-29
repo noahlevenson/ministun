@@ -6,7 +6,7 @@ STUN is a simple protocol. A STUN implementation should be simple too.
 
 ministun is a **zero dependency** STUN server. It implements "Basic Server Behavior"<sup>1</sup> as defined by [section 13](https://tools.ietf.org/html/rfc5389#section-13) of [RFC 5389](https://tools.ietf.org/html/rfc5389), including backwards compatibility with [RFC 3489](https://tools.ietf.org/html/rfc3489). 
 
-Developed with WebRTC p2p in mind, it was designed to easily add STUN services to distributed hash tables.
+Developed with WebRTC p2p in mind, it was designed to easily and reliably add STUN services to distributed hash tables.
 
 In the future, ministun could evolve to provide a more robust implementation of RFC 5389, including client functions.
 
@@ -42,23 +42,23 @@ async function stopServer() {
 ```
 
 ### Configuration
-- **udp4**: *bool* (Default: true)<br>
+- **udp4**: *bool* (Default: `true`)<br>
 Support UDP over IPv4?
 
-- **udp6**: *bool* (Default: true)<br>
+- **udp6**: *bool* (Default: `true`)<br>
 Support UDP over IPv6?
 
-- **port**: *number* (Default: 3478)<br>
+- **port**: *number* (Default: `3478`)<br>
 Port number
 
-- **log**: *function || null* (Default: console.log)<br>
-Log messages will be passed to this function as arg 0, null = no logging 
+- **log**: *function || null* (Default: `console.log`)<br>
+Log messages will be passed to this function as arg 0, null = no message logging 
 
-- **err**: *function || null* (Default: console.err)<br>
-Error messages will be passed to this function as arg 0, null = no logging 
+- **err**: *function || null* (Default: `console.err`)<br>
+Error messages will be passed to this function as arg 0, null = no error logging 
 
-- **sw**: *bool* (Default: true)<br>
-Send the SOFTWARE attribute with binding response messages? 
+- **sw**: *bool* (Default: `true`)<br>
+Send the SOFTWARE attribute with response messages? 
 
 ### TODO
 Test coverage definitely ain't 100%
