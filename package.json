@@ -1,6 +1,6 @@
 {
   "name": "ministun",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Zero dependency STUN server in < 1000 lines",
   "main": "src/ministun.js",
   "scripts": {
@@ -10,6 +10,14 @@
     "type": "git",
     "url": "git+https://github.com/noahlevenson/ministun.git"
   },
+  "keywords": [
+    "stun",
+    "webrtc",
+    "rfc5389",
+    "5389",
+    "rfc3489",
+    "3489"
+  ],
   "author": "Noah Levenson (https://noahlevenson.com)",
   "license": "MIT",
   "bugs": {
