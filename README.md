@@ -12,6 +12,9 @@ In the future, ministun could evolve to provide a more robust implementation of 
 
 <sup>1</sup> Since ministun is focused on STUN services for WebRTC, it currently lacks support for STUN over TCP. (Browsers seem to [implement their STUN clients](https://groups.google.com/forum/#!topic/discuss-webrtc/IIrakQPaSw0) for WebRTC over UDP only).
 
+### Requirements
+Node.js >= 12.14.0
+
 ### Installation
 ```
 npm i ministun
