@@ -52,7 +52,7 @@ class MStunMsg {
 				const alen = buf.slice(attrptr + MStunAttr.K_LEN_OFF[0], attrptr + MStunAttr.K_LEN_OFF[1]);
 				const vlen = MStunAttr._decLen(alen);
 				const aval = buf.slice(attrptr + MStunAttr.K_LEN_OFF[1], attrptr + MStunAttr.K_LEN_OFF[1] + vlen);
-				attrs.push(MStunAttr.from(atype, alen, aval));
+				attrs.push(MStunAttr.from({type: atype, len: alen, val: aval}));
 				attrptr += (vlen + MStunAttr.K_TYPE_LEN + MStunAttr.K_LEN_LEN);
 			}
 		}
