@@ -158,7 +158,7 @@ class Ministun {
 			 	return;
 			}
 
-			this._lout(`${Object.keys(MStunHeader.K_MSG_TYPE)[MStunHeader._decType(stunMsgObj.hdr.type).type]} received from ${rinfo.address}:${rinfo.port}\n`);
+			this._lout(`${Object.keys(MStunHeader.K_MSG_TYPE)[MStunHeader._decType(stunMsgObj.hdr.type).type]} sent to ${rinfo.address}:${rinfo.port}\n`);
 		});
 	}
 }
