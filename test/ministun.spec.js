@@ -2,7 +2,7 @@
 
 const assert = require("assert");
 const p = require("child_process");
-const { Ministun } = require("../src/ministun.js");
+const Ministun = require("../src/ministun.js");
 const { MStunMsg } = require("../src/mmsg.js");
 const { MStunHeader } = require("../src/mhdr.js");
 
