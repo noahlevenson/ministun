@@ -4,7 +4,7 @@
 
 STUN (Session Traversal Utilities for NAT) is a simple protocol. A STUN implementation should be simple too.
 
-ministun is a **zero dependency** STUN server for Node.js. It implements "Basic Server Behavior"<sup>1</sup> as defined by [section 13](https://tools.ietf.org/html/rfc5389#section-13) of [RFC 5389](https://tools.ietf.org/html/rfc5389), including backwards compatibility with [RFC 3489](https://tools.ietf.org/html/rfc3489). 
+ministun is a **zero dependency** STUN server for Node.js. It implements "Basic Server Behavior" as defined by [section 13](https://tools.ietf.org/html/rfc5389#section-13) of [RFC 5389](https://tools.ietf.org/html/rfc5389), including backwards compatibility with [RFC 3489](https://tools.ietf.org/html/rfc3489). 
 
 ### Requirements
 Node.js >= 12.14.0
