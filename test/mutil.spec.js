@@ -143,4 +143,40 @@ const { MUtil } = require("../src/mutil.js");
 	for (let i = 0; i < res4.length; i += 1) {
 		assert.strictEqual(res4[i], golden4[i]);
 	}
+
+	const str5 = "2001:0db8:85a3::8a2e:0370:7334";
+	const golden5 = Buffer.from([0x20, 0x01, 0x0D, 0xB8, 0x85, 0xA3, 0x00, 0x00, 0x00, 0x00, 0x8A, 0x2E, 0x03, 0x70, 0x73, 0x34]);
+
+	const res5 = MUtil._ipv6Str2Buf128(str5);
+
+	assert.strictEqual(Buffer.isBuffer(res5), true);
+	assert.strictEqual(res5.length, golden5.length);
+
+	for (let i = 0; i < res5.length; i += 1) {
+		assert.strictEqual(res5[i], golden5[i]);
+	}
+
+	const str6 = "1::";
+	const golden6 = Buffer.from([0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+
+	const res6 = MUtil._ipv6Str2Buf128(str6);
+
+	assert.strictEqual(Buffer.isBuffer(res6), true);
+	assert.strictEqual(res6.length, golden6.length);
+
+	for (let i = 0; i < res6.length; i += 1) {
+		assert.strictEqual(res6[i], golden6[i]);
+	}
+
+	const str7 = "::";
+	const golden7 = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+
+	const res7 = MUtil._ipv6Str2Buf128(str7);
+
+	assert.strictEqual(Buffer.isBuffer(res7), true);
+	assert.strictEqual(res7.length, golden7.length);
+
+	for (let i = 0; i < res1.length; i += 1) {
+		assert.strictEqual(res7[i], golden7[i]);
+	}
 })();
