@@ -58,29 +58,22 @@ class MUtil {
 
 	// TODO: Validation
 	static _ipv6Str2Buf128(str) {
-		const arr = str.split(":");
-		const len = arr.length - 1;
-
-		// It's an ipv4 mapped ipv6 address
-		if (net.isIPv4(arr[len]) && arr[len - 1].toUpperCase() === "FFFF") {
-			arr[len] = arr[len].split(".").map((n) => {
-				return parseInt(n).toString(16).padStart(2, "0");
-			}).join("");
-		}
-
-		const hs = arr.join("").padStart(16, "0");
-		const buf = Buffer.alloc(16);
-
-		let i = hs.length - 2;
-		let j = buf.length - 1;
-
-		while (i >= 0) {
-			buf[j] = parseInt(hs.substring(i, i + 2), 16);
-			i -= 2;
-			j -= 1;
-		}
-
-		return buf;
+    // Expand the double colon if it exists
+    str = str.replace("::", `::${":".repeat(7 - str.match(/:/g).length)}`);
+    // Expand leading zeroes in each hextet
+		const hextets = str.split(":").map(h => h.padStart(4, "0"));
+    
+    // It's an IPv4 mapped IPv6 address
+    if (net.isIPv4(hextets[hextets.length - 1]) && 
+      hextets[hextets.length - 2].toUpperCase() === "FFFF") {
+      const buf = Buffer.alloc(16);
+      buf.writeUInt32BE(0xFFFF, 8);
+      MUtil._ipv4Str2Buf32(hextets[hextets.length - 1]).copy(buf, 12);
+      return buf
+    }
+    
+    // It's a regular IPv6 address
+    return Buffer.from(hextets.join(""), "hex");
 	}
 }
 
