@@ -44,7 +44,7 @@ class MUtil {
 			if (a[i] != b[i]) {
 				return false;
 			}
-		}	
+		} 
 
 		return true;
 	}
@@ -58,50 +58,22 @@ class MUtil {
 
 	// TODO: Validation
 	static _ipv6Str2Buf128(str) {
-		const buf = Buffer.alloc(16);
-		const arr = str.split(":");
-		const len = arr.length - 1;
-		let i = 0;
-
-		// It's an ipv4 mapped ipv6 address
-		if (net.isIPv4(arr[len]) && arr[len - 1].toUpperCase() === "FFFF") {
-			while (i < 10) buf[i++] = 0;
-			buf[i++] = 0xff;
-			buf[i++] = 0xff;
-			arr[len].split(".").forEach(n => buf[i++] = parseInt(n));
+		// Expand the double colon if it exists
+		str = str.replace("::", `::${":".repeat(7 - str.match(/:/g).length)}`);
+		// Expand leading zeroes in each hextet
+		const hextets = str.split(":").map(h => h.padStart(4, "0"));
+		
+		// It's an IPv4 mapped IPv6 address
+		if (net.isIPv4(hextets[hextets.length - 1]) && 
+			hextets[hextets.length - 2].toUpperCase() === "FFFF") {
+			const buf = Buffer.alloc(16);
+			buf.writeUInt32BE(0xFFFF, 8);
+			MUtil._ipv4Str2Buf32(hextets[hextets.length - 1]).copy(buf, 12);
 			return buf;
 		}
-
-		let didExpansion = false;
-		let missing = 8 - arr.length;
-		for (var p of arr) {
-			if (p === '') {
-				if (didExpansion) {
-					buf[i++] = 0;
-					buf[i++] = 0;
-				} else {
-					didExpansion = true;
-					while (missing-- >= 0) {
-						buf[i++] = 0;
-						buf[i++] = 0;
-					}
-				}
-			} else if (p.length === 4) {
-				buf[i++] = parseInt(p.slice(0, 2), 16);
-				buf[i++] = parseInt(p.slice(2, 4), 16);
-			} else if (p.length === 3) {
-				buf[i++] = parseInt(p.slice(0, 1), 16);
-				buf[i++] = parseInt(p.slice(1, 3), 16);
-			} else if (p.length) {
-				buf[i++] = 0;
-				buf[i++] = parseInt(p, 16);
-			} else {
-				buf[i++] = 0;
-				buf[i++] = 0;
-			}
-		}
-
-		return buf;
+		
+		// It's a regular IPv6 address
+		return Buffer.from(hextets.join(""), "hex");
 	}
 }
 
