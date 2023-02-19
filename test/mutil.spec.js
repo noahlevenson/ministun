@@ -176,7 +176,19 @@ const { MUtil } = require("../src/mutil.js");
 	assert.strictEqual(Buffer.isBuffer(res7), true);
 	assert.strictEqual(res7.length, golden7.length);
 
-	for (let i = 0; i < res1.length; i += 1) {
+	for (let i = 0; i < res7.length; i += 1) {
 		assert.strictEqual(res7[i], golden7[i]);
+	}
+	
+	const str8 = "2001:db8:85a3:0000:0000:8a2e:0370:7334";
+	const golden8 = Buffer.from([0x20, 0x01, 0x0D, 0xB8, 0x85, 0xA3, 0x00, 0x00, 0x00, 0x00, 0x8A, 0x2E, 0x03, 0x70, 0x73, 0x34]);
+
+	const res8 = MUtil._ipv6Str2Buf128(str8);
+
+	assert.strictEqual(Buffer.isBuffer(res8), true);
+	assert.strictEqual(res8.length, golden8.length);
+
+	for (let i = 0; i < res8.length; i += 1) {
+		assert.strictEqual(res8[i], golden8[i]);
 	}
 })();
