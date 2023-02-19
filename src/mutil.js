@@ -44,7 +44,7 @@ class MUtil {
 			if (a[i] != b[i]) {
 				return false;
 			}
-		}	
+		} 
 
 		return true;
 	}
@@ -58,22 +58,22 @@ class MUtil {
 
 	// TODO: Validation
 	static _ipv6Str2Buf128(str) {
-    // Expand the double colon if it exists
-    str = str.replace("::", `::${":".repeat(7 - str.match(/:/g).length)}`);
-    // Expand leading zeroes in each hextet
+		// Expand the double colon if it exists
+		str = str.replace("::", `::${":".repeat(7 - str.match(/:/g).length)}`);
+		// Expand leading zeroes in each hextet
 		const hextets = str.split(":").map(h => h.padStart(4, "0"));
-    
-    // It's an IPv4 mapped IPv6 address
-    if (net.isIPv4(hextets[hextets.length - 1]) && 
-      hextets[hextets.length - 2].toUpperCase() === "FFFF") {
-      const buf = Buffer.alloc(16);
-      buf.writeUInt32BE(0xFFFF, 8);
-      MUtil._ipv4Str2Buf32(hextets[hextets.length - 1]).copy(buf, 12);
-      return buf
-    }
-    
-    // It's a regular IPv6 address
-    return Buffer.from(hextets.join(""), "hex");
+		
+		// It's an IPv4 mapped IPv6 address
+		if (net.isIPv4(hextets[hextets.length - 1]) && 
+			hextets[hextets.length - 2].toUpperCase() === "FFFF") {
+			const buf = Buffer.alloc(16);
+			buf.writeUInt32BE(0xFFFF, 8);
+			MUtil._ipv4Str2Buf32(hextets[hextets.length - 1]).copy(buf, 12);
+			return buf
+		}
+		
+		// It's a regular IPv6 address
+		return Buffer.from(hextets.join(""), "hex");
 	}
 }
 
