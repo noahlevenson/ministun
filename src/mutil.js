@@ -69,7 +69,7 @@ class MUtil {
 			const buf = Buffer.alloc(16);
 			buf.writeUInt32BE(0xFFFF, 8);
 			MUtil._ipv4Str2Buf32(hextets[hextets.length - 1]).copy(buf, 12);
-			return buf
+			return buf;
 		}
 		
 		// It's a regular IPv6 address
