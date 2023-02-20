@@ -1,6 +1,6 @@
 # ministun
 
-[![Build Status](https://travis-ci.com/noahlevenson/ministun.svg?token=K7qYwxmEyNTnFvh71KfW&branch=master)](https://travis-ci.com/noahlevenson/ministun)
+![Unit tests](https://github.com/noahlevenson/ministun/workflows/Unit%20tests/badge.svg)
 
 STUN (Session Traversal Utilities for NAT) is a simple protocol. A STUN implementation should be simple too.
 

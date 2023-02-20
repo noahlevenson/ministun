@@ -1,0 +1,13 @@
+name: Unit tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: All tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Ministun
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: $GITHUB_WORKSPACE/.github/workflows/test.sh
