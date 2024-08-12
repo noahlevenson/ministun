@@ -1,6 +1,6 @@
 # ministun
 
-![Unit tests](https://github.com/noahlevenson/ministun/workflows/Unit%20tests/badge.svg)
+[![Unit tests](https://github.com/noahlevenson/ministun/actions/workflows/test.yml/badge.svg)](https://github.com/noahlevenson/ministun/actions/workflows/test.yml)
 
 STUN (Session Traversal Utilities for NAT) is a simple protocol. A STUN implementation should be simple too.
 
